@@ -3,7 +3,8 @@ window.renderGuideScene=(key,step)=>{
  const titles={web:'Safari',sms:'Messages',call:'Phone',calendar:'Calendars'};
  const chevron='<img class="scene-chevron" src="assets/test/chevron.svg" alt="">';
  const check='<img class="scene-check" src="assets/icons/check.svg" alt="">';
- const row=(text,{active=false,toggle=false,selected=false,icon=null}={})=>`<div class="scene-row ${active?'scene-target':''}">${icon?`<img class="scene-app-icon" src="${icon}" alt="">`:''}<span>${text}</span>${toggle?'<span class="scene-toggle" aria-hidden="true"></span>':selected?check:chevron}</div>`;
+ const tap=key==='web'?'<span class="scene-tap-guide" aria-hidden="true"><span class="scene-tap-ripple"></span><span class="scene-tap-hand"></span></span>':'';
+ const row=(text,{active=false,toggle=false,selected=false,icon=null}={})=>`<div class="scene-row ${active?'scene-target':''}">${icon?`<img class="scene-app-icon" src="${icon}" alt="">`:''}<span>${text}</span>${toggle?'<span class="scene-toggle" aria-hidden="true"></span>':selected?check:chevron}${active?tap:''}</div>`;
  const group=rows=>'<div class="scene-group">'+rows.join('')+'</div>';
  let title,body;
  if(step===0){title='Settings';body=group([row('General'),row('Accessibility'),row('Privacy & Security',{active:key==='calendar'})])+group([row('Apps',{active:key!=='calendar'})]);}
@@ -12,6 +13,6 @@ window.renderGuideScene=(key,step)=>{
  else if(key==='sms'){title='Unknown & Spam';body='<p class="scene-caption">TEXT MESSAGE FILTERING</p>'+group([row('None'),row('Clean Web',{active:true,selected:true,icon:'assets/icons/sms.png'})]);}
  else if(key==='call'){title='Call Blocking & Identification';body=group([row('Clean Web',{active:true,toggle:true,icon:'assets/icons/call.png'})]);}
  else if(key==='calendar'){title='Clean Web';body=group([row('None'),row('Add Events Only'),row('Full Access',{active:true,selected:true})]);}
- else {title='Extensions';body=group([row('Clean Web',{active:true,toggle:true,icon:'assets/icons/shield-check.svg'})]);}
- return `<div class="guide-scene" aria-label="Clean Web settings illustration: ${title}"><div class="scene-navigation"><img src="assets/test/detail-back.svg" alt=""><strong>${title}</strong></div><div class="scene-content">${body}</div></div>`;
+ else {title='Extensions';body=group([row('SecurityCenter',{active:true,toggle:true,icon:'assets/icons/shield-check.svg'})]);}
+ return `<div class="guide-scene" aria-label="${key==='web'?'SecurityCenter':'Clean Web'} settings illustration: ${title}"><div class="scene-navigation"><img src="assets/test/detail-back.svg" alt=""><strong>${title}</strong></div><div class="scene-content">${body}</div></div>`;
 };

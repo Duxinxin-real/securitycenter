@@ -1,7 +1,7 @@
 (() => {
  const guides={
   web:{title:'Browsing Protection',path:'Settings › Apps › Safari › Extensions',steps:[
-   ['Open Apps in Settings'],['Choose Safari'],['Tap Extensions'],['Enable Clean Web']
+   ['Open Apps in Settings'],['Choose Safari'],['Tap Extensions'],['Enable SecurityCenter']
   ]},
   calendar:{title:'Calendar Clean',path:'Settings › Privacy & Security › Calendars › Your app',steps:[
    ['Open Privacy & Security'],['Tap Calendars'],['Choose Clean Web'],['Choose Full Access']
@@ -78,6 +78,7 @@
    const [label]=guides[key].steps[step];
    const visual=page.querySelector('.guide-visual');
    visual.innerHTML=window.renderGuideScene(key,step);
+   page.querySelector('.guide-instruction').textContent=key==='web'?decode(label):'';
    page.querySelector('.guide-step-count').textContent=`${step+1} / ${guides[key].steps.length}`;
    page.querySelectorAll('[data-guide-step]').forEach((b,i)=>i===step?b.setAttribute('aria-current','step'):b.removeAttribute('aria-current'));
   }

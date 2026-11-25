@@ -52,3 +52,13 @@
 .scene-chevron{width:12px;height:18px;object-fit:contain;flex:none}.scene-check{width:22px;height:22px;flex:none}.scene-app-icon{width:31px;height:31px;object-fit:contain;border-radius:50%;flex:none}
 .scene-toggle{display:block;width:43px;height:26px;background:#5cd5ae;border-radius:20px;position:relative;flex:none}.scene-toggle::after{content:'';position:absolute;right:3px;top:3px;background:#fff;width:20px;height:20px;border-radius:50%}
 .scene-caption{font-size:11px;letter-spacing:.6px;color:#8b929d;margin:0 12px 10px}
+
+/* Browsing Protection: a decorative tap indicator anchored to the live highlighted row. */
+[data-guide="web"] .scene-tap-guide{position:absolute;z-index:1;inset-inline-end:29px;top:50%;width:0;height:0;pointer-events:none}
+[data-guide="web"][data-step="4"] .scene-tap-guide{inset-inline-end:28px}
+.scene-tap-ripple{position:absolute;left:0;top:0;width:22px;height:22px;border:2px solid #008669;border-radius:50%;transform:translate(-50%,-50%);animation:scene-tap-ripple .55s .19s ease-out both}
+.scene-tap-hand{position:absolute;left:-9px;top:-1px;width:23px;height:23px;transform-origin:42.1875% 0%;transform:rotate(-30deg);color:#04745d;filter:drop-shadow(0 1px 2px #fff);animation:scene-tap-hand .29s ease-out both}
+.scene-tap-hand::before{content:'';display:block;width:100%;height:100%;background:currentColor;mask:url('guide/web-tap-hand.svg') center/contain no-repeat}
+@keyframes scene-tap-hand{from{transform:translate(6px,6px) rotate(-30deg)}to{transform:rotate(-30deg)}}
+@keyframes scene-tap-ripple{from{transform:translate(-50%,-50%) scale(.45);opacity:.86}to{transform:translate(-50%,-50%) scale(1.55);opacity:0}}
+@media(prefers-reduced-motion:reduce){.scene-tap-hand{animation:none}.scene-tap-ripple{display:none;animation:none}}
