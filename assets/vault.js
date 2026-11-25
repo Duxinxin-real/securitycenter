@@ -97,6 +97,70 @@ window.initVault=({open,close})=>{
   const keys=await Promise.all(modes.map(m=>verify(m,pin)));if(!valid())return;const i=keys.findIndex(Boolean);
   if(i>=0){attempts=0;until=0;await unlock(modes[i],keys[i]);return;}if(++attempts>=5){until=Date.now()+30000;attempts=0;}throw Error('Incorrect passcode.');
  }});}
+ // Public preview only: prepare all ciphertext off to the side before a single in-memory commit.
+ // The persistent preview uses IndexedDB and a different commit protocol; never touch it here.
+ let changing=false;
+ function cancelPasscodeChange(){if(!changing)return;changing=false;hidePanel();phone.classList.remove('vault-onboarding');}
+ function passcodeChangeStatus(){return !onboardingPreview||profileError||!ready()?'unavailable':state.profile.private?'ready':'setup';}
+ function changePasscode(onReturn,stage){
+  if(passcodeChangeStatus()!=='ready'||changing||state.active)return false;
+  changing=true;
+  const done=changed=>{cancelPasscodeChange();onReturn(changed);};
+  const start=()=>{
+   stage('verify');
+   prompt({title:'Enter Current Passcode',action:'Continue',onBack:()=>done(false),handler:async(pin,valid)=>{
+    if(Date.now()<until)throw Error('Wait 30 seconds, then try again.');
+    const keys=await Promise.all(modes.map(m=>verify(m,pin)));if(!valid())return;
+    const index=keys.findIndex(Boolean);
+    if(index<0){if(++attempts>=5){until=Date.now()+30000;attempts=0;}throw Error('Incorrect passcode.');}
+    attempts=0;until=0;
+    const mode=modes[index],oldKey=keys[index],profile=state.profile[mode];
+    enterNew(mode,oldKey,profile);
+   }});
+  };
+  const enterNew=(mode,oldKey,profile)=>{
+   stage('new');
+   prompt({title:'Enter New Passcode',action:'Continue',onBack:start,handler:async(newPin,valid)=>{
+    const duplicates=await Promise.all(modes.map(m=>verify(m,newPin)));if(!valid())return;
+    if(duplicates.some(Boolean))throw Error('Choose a different passcode.');
+    stage('confirm');
+    prompt({title:'Confirm New Passcode',action:'Save Passcode',onBack:()=>enterNew(mode,oldKey,profile),handler:async(confirm,validConfirm)=>{
+     if(confirm!==newPin)throw Error('Passcodes do not match.');
+     if(!validConfirm()||!changing)return;
+     try{
+      const currentRecord=await readRecord('catalogs',profile.catalogId);
+      const plainCatalog=await unseal(oldKey,currentRecord);
+      const albums=JSON.parse(new TextDecoder().decode(plainCatalog));
+      if(!Array.isArray(albums)||albums.some(a=>!Array.isArray(a.items)))throw Error('Invalid catalog.');
+      if(!validConfirm()||!changing)return;
+      const salt=crypto.getRandomValues(new Uint8Array(16)),iv=vector(),key=await derive(newPin,salt);
+      const proof=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,encoder.encode('vault:'+mode));
+      if(!validConfirm()||!changing)return;
+      const catalog=await seal(key,plainCatalog,currentRecord.id);
+      catalog.revision=currentRecord.revision+1;
+      const media=new Map();
+      for(const {id} of albums.flatMap(a=>a.items)){
+       if(media.has(id))continue;
+       const record=await readRecord('media',id);
+       const plain=await unseal(oldKey,record);
+       if(!validConfirm()||!changing)return;
+       media.set(id,await seal(key,plain,id));
+      }
+      if(!validConfirm()||!changing)return;
+      const existing=transient.catalogs.get(profile.catalogId);
+      if(state.profile[mode]!==profile||existing?.revision!==currentRecord.revision)throw Error('Concurrent change.');
+      const profiles={...state.profile,[mode]:{...profile,salt:[...salt],iv:[...iv],proof:[...bytes(proof)]}};
+      const nextProfiles=structuredClone(profiles),nextCatalogs=new Map(transient.catalogs),nextMedia=new Map(transient.media);
+      nextCatalogs.set(catalog.id,catalog);for(const [id,record] of media)nextMedia.set(id,record);
+      Object.assign(transient,{profiles:nextProfiles,catalogs:nextCatalogs,media:nextMedia});state.profile=profiles;
+      done(true);
+     }catch{if(validConfirm()&&changing)throw Error('Could not change the passcode. Your current passcode still works.');}
+    }});
+   }});
+  };
+  start();
+  return true;
+ }
  function render(){if(!state.active)return;release();const albums=state.data[state.active],empty=!albums.length;$('#vault-albums').classList.toggle('is-empty',empty);$('#vault-empty-state').hidden=!empty;$('#vault-grid').hidden=empty;$('#vault-grid').innerHTML=albums.map(a=>`<button class="vault-album" data-album="${a.id}"><span class="vault-cover ${a.cover==='videos'?'vault-video-cover':''}"><img src="assets/vault/${esc(a.cover)}.png" alt=""></span><strong>${esc(a.name)}</strong><span class="album-count">${a.items.length} ${a.items.length===1?'item':'items'}</span></button>`).join('');}
  async function showAlbum(id){if(!state.active)return;close();release();hidePanel();state.album=id;const a=current();if(!a)return;const version=state.version,key=state.key;panel.hidden=false;page.inert=true;phone.classList.add('detail-open');
   panel.innerHTML=`<header class="vault-album-header">${back}<h1>${esc(a.name)}</h1><button class="vault-icon" id="vault-more" aria-label="Album options"><img src="assets/vault/more.svg" alt=""></button></header><div class="vault-media" id="vault-media">${a.items.length?'':'<p class="vault-empty">No photos or videos yet</p>'}</div><footer class="vault-pin-footer"><button class="vault-primary" id="vault-album-add">${icon('plus-transparent.svg')}Add Media</button></footer>`;
@@ -146,5 +210,5 @@ window.initVault=({open,close})=>{
  }
  // BFCache restores an old document; a full return to this explicit trial starts fresh too.
  if(onboardingPreview)window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
- return {lock,enter,release:()=>{if(state.active&&panel.hidden)render();}};
+ return {lock,enter,passcodeChangeStatus,changePasscode,cancelPasscodeChange,release:()=>{if(state.active&&panel.hidden)render();}};
 };

@@ -723,6 +723,12 @@
   ]
 };
  docs['calendar-guide']=["Calendar Clean · 权限教程", "指导用户在系统设置完成Calendar Clean所需设置。", [], "", ["进入从第1步开始；步骤号为当前序号/4，每2.2秒轮播。点击分页或左右滑动切换；后台、离开及减少动态时停止自动播放。", "按路径Privacy & Security→Calendars→本应用→Full Access手动完成设置；教程图片与分页本身不授予权限。", "返回回Calendar Clean；打开设置失败时留在教程，可重试。", "从系统设置返回后重新确认日历权限，由用户再次发起扫描；权限不足时保留说明和设置入口。"], [["教程", "四步图片、分页与Open Settings。"], ["打开设置", "避免重复点击；失败时保留当前步骤并允许重试。"]]];
+ docs.settings=['Settings','会员入口置顶；下方按用途分组。',[],'', ['会员入口打开价格页；Web Protection 打开原防护流程；Change Passcode 打开密码验证。','返回恢复上一个页面。未设过密码时，先进入 Vault 设置。'],[['会员','可查看周会员价格与权益。'],['更改密码','验证原密码后修改该密码对应的保险箱；不显示另一套密码或相册是否存在。']]];
+ docs.membership=['Membership','展示周会员的权益与价格。',[],'', ['返回 Settings。'],[['权益','Safari 广告拦截、照片打码、私密保险箱。'],['价格','首周 $0.99，此后每周 $9.99；每周自动续订，可随时取消。']]];
+ docs.about=['About','展示应用名称。',[],'',['返回 Settings。'],[['应用','SecurityCenter。']]];
+ docs['settings-passcode-verify']=['输入当前密码','使用六位数字密码验证。',[],'',['输入满六位后继续。返回 Settings 放弃修改。'],[['无效密码','提示重试；连续五次错误后等待 30 秒。']]];
+ docs['settings-passcode-new']=['输入新密码','新密码由六位数字组成。',[],'',['不能使用任何已设置的密码；输入后进入确认。'],[['返回','回到当前密码验证。']]];
+ docs['settings-passcode-confirm']=['确认新密码','再次输入新密码，确认并保存后才生效。',[],'',['两次输入不一致时可重新输入。返回上一步不保存。'],[['保存成功','返回 Settings；旧密码失效，原媒体及另一套密码不变。'],['保存失败','旧密码仍可使用，不改动原有媒体。']]];
  const left=document.createElement('aside'),right=document.createElement('aside');left.className='preview-panel preview-left';right.className='preview-panel preview-right';left.setAttribute('aria-label','状态调试');right.setAttribute('aria-label','功能需求');document.body.append(left,right);
  const toggle=document.createElement('button');toggle.className='preview-mobile-toggle';toggle.textContent='调试 / 需求';toggle.onclick=()=>document.body.classList.toggle('debug-mobile');document.body.append(toggle);
  function click(s){const b=$(s);if(b&&!b.disabled)b.click();}

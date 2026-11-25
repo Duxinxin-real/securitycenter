@@ -6,7 +6,7 @@
  try{const saved=JSON.parse(localStorage.getItem('clean-web-preview-v2'));if(saved){state.permission=saved.permission===true;for(const k of Object.keys(state.enabled))if(typeof saved.enabled?.[k]==='boolean')state.enabled[k]=saved.enabled[k];}}catch{}
  function saveWeb(){localStorage.setItem('clean-web-preview-v2',JSON.stringify(state));}
  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
- const scroll=$('#clean-scroll'),root=$('#modal-root'),content=$('#sheet-content');let returnFocus=null,currentSheet='',cancelPrivacy=()=>{},vaultController=null;
+ const scroll=$('#clean-scroll'),root=$('#modal-root'),content=$('#sheet-content');let returnFocus=null,currentSheet='',cancelPrivacy=()=>{},vaultController=null,settingsController=null;
  let activeTab='clean';
  const testScroll=$('#test-scroll'),positions={clean:0,test:0,vault:0,privacy:0};
  const activeScroll=()=>activeTab==='privacy'?$('#privacy-scroll'):activeTab==='vault'?$('#vault-scroll'):activeTab==='test'?testScroll:scroll;
@@ -51,13 +51,13 @@
  $('#manage').onclick=()=>cleanGuide('web');
  $('#web-master').onclick=()=>{if(webUnknown)return setup();if(!state.permission)return setup();if(count()===0){setAll(true);return;}if(count()===5)return confirmOff();manage();};
  $('#hero-switch').onclick=()=>{if(webUnknown)return setup();if(!state.permission)return setup();count()?confirmOff():setAll(true);};
- $$('.settings-trigger').forEach(b=>b.onclick=()=>open(closeHTML+'<h2 id="sheet-title">Settings</h2><button class="sheet-action secondary" data-action="manage">Web Protection</button><button class="sheet-action secondary" data-action="close">Done</button>','settings'));
  $$('[data-tool]').forEach(b=>b.onclick=()=>b.dataset.tool==='calendar'?window.calendarPreview.open():b.dataset.tool==='sms'?window.smsController.show():b.dataset.tool==='call'?window.callController.show():cleanGuide(b.dataset.tool));
  $('.scrim').onclick=close;
  document.addEventListener('keydown',e=>{if(root.hidden)return;if(e.key==='Escape'){e.preventDefault();close();}if(e.key==='Tab'){const f=[...content.querySelectorAll('button')];if(!f.length)return;const first=f[0],last=f[f.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
  scroll.addEventListener('scroll',()=>{$('.phone').classList.toggle('is-scrolled',scroll.scrollTop>72);$('.compact-header').setAttribute('aria-hidden',String(scroll.scrollTop<=72));$('.compact-header').inert=scroll.scrollTop<=72;},{passive:true});
  function phoneVaultCleanup(){document.querySelector('.phone').classList.remove('vault-onboarding');}
  function selectTab(tab){
+  if(settingsController?.isOpen())return;
   context(tab);
   if(tab===activeTab){activeScroll().scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});return;}
   if(!root.hidden)close();
@@ -84,6 +84,8 @@
  }
  $$('[data-privacy]').forEach(b=>b.onclick=()=>showPrivacy(b.dataset.privacy));
  vaultController=window.initVault({open:html=>open(html,'vault'),close});
+ settingsController=window.initSettings({vault:vaultController,context,tab:()=>activeTab,web:()=>{selectTab('clean');manage();},setupVault:()=>selectTab('vault')});
+ $$('.settings-trigger').forEach(b=>b.onclick=()=>settingsController.open(b));
  function showPerformance(key){
   context(key);
   $('#test-page').hidden=true;
@@ -99,5 +101,5 @@
  $$('[data-test]').forEach(b=>b.onclick=()=>{const key=b.dataset.test;if(['speed','cpu','display'].includes(key))return showPerformance(key);showSafety(key);});
  document.addEventListener('wheel',e=>{if(!root.hidden||e.target.closest('.phone,.preview-panel'))return;activeScroll().scrollTop+=e.deltaY;e.preventDefault();},{passive:false});
  window.previewApp={webSnapshot:()=>({...state,enabled:{...state.enabled},busy:webBusy,error:webError,unknown:webUnknown}),web(mode){clearTimeout(webTimer);webBusy=false;webError='';webUnknown=false;if(mode==='save-failed'){state.permission=true;webFailNext=true;commitWeb({...state.enabled,ads:!state.enabled.ads});return;}if(mode==='unknown'){webUnknown=true;render();return;}state.permission=mode!=='setup';definitions.forEach(([k],i)=>state.enabled[k]=mode==='on'||(mode==='partial'&&i<3));try{saveWeb();}catch{}render();window.dispatchEvent(new CustomEvent('preview-context',{detail:{key:'clean',state:mode}}));},lockVault(){vaultController.lock();context('vault');}};
- function fit(){if(innerWidth<=440){document.documentElement.style.setProperty('--scale',1);$('.device-wrap').style.height='';$('.device-wrap').style.width='';return;}const s=Math.min(1,(innerHeight-40)/844);document.documentElement.style.setProperty('--scale',s);$('.device-wrap').style.height=(844*s)+'px';$('.device-wrap').style.width=(393*s)+'px';}addEventListener('resize',fit);fit();render();const initialRoute=location.hash;if(initialRoute.startsWith('#privacy'))selectTab('privacy');if(initialRoute.startsWith('#vault'))selectTab('vault');if(initialRoute.startsWith('#test')){selectTab('test');history.replaceState(null,'',initialRoute);}const initialDetail=initialRoute.split('/')[1];if(['speed','cpu','display'].includes(initialDetail))showPerformance(initialDetail);else if(['link','qr','wifi','device'].includes(initialDetail))showSafety(initialDetail);else if(initialRoute.startsWith('#privacy/')&&['scan','redact','metadata'].includes(initialDetail))showPrivacy(initialDetail);
+ function fit(){if(innerWidth<=440){document.documentElement.style.setProperty('--scale',1);$('.device-wrap').style.height='';$('.device-wrap').style.width='';return;}const s=Math.min(1,(innerHeight-40)/844);document.documentElement.style.setProperty('--scale',s);$('.device-wrap').style.height=(844*s)+'px';$('.device-wrap').style.width=(393*s)+'px';}addEventListener('resize',fit);fit();render();const initialRoute=location.hash;if(initialRoute.startsWith('#privacy'))selectTab('privacy');if(initialRoute.startsWith('#vault'))selectTab('vault');if(initialRoute.startsWith('#test')){selectTab('test');history.replaceState(null,'',initialRoute);}const initialDetail=initialRoute.split('/')[1];if(['speed','cpu','display'].includes(initialDetail))showPerformance(initialDetail);else if(['link','qr','wifi','device'].includes(initialDetail))showSafety(initialDetail);else if(initialRoute.startsWith('#privacy/')&&['scan','redact','metadata'].includes(initialDetail))showPrivacy(initialDetail);if(/^#settings(?:\/(?:membership|about))?$/.test(initialRoute))settingsController.open(null,initialDetail||'settings');
 })();
