@@ -1,0 +1,52 @@
+.safety-body{padding:8px 19px 25px}
+.safety-art{min-height:160px;border:1px solid #e6efeb;border-radius:25px;background:radial-gradient(circle at 50% 30%,#ddf9ed,#f3f4f7 71%);display:grid;place-items:center;margin:2px 0 20px}
+.safety-art>span{display:grid;place-items:center;width:82px;height:82px;background:#fff;border-radius:27px;box-shadow:0 10px 26px #2868541a}
+.safety-art img{height:42px;width:42px}
+.safety-body label{display:block;font-size:14px;font-weight:700;margin:0 0 7px}
+.safety-body input:not([hidden]){width:100%;border:1px solid #dce8e3;border-radius:14px;background:#f6f8f7;color:inherit;font:inherit;padding:13px}
+.safety-result{background:#f3f6f5;border-radius:18px;padding:14px 15px;margin-top:16px;overflow-wrap:anywhere}
+.safety-result strong{font-size:16px;color:#175846}.safety-result p{font-size:13px;margin:7px 0;color:#53635e;line-height:1.4}
+.safety-footer{display:grid;gap:7px}
+.safety-secondary{min-height:38px;font-size:14px;font-weight:700;color:#08745a}
+.safety-video{display:block;width:100%;min-height:180px;max-height:250px;object-fit:cover;background:#162427;border-radius:20px}
+.safety-result-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid #e4ebe7;padding-bottom:7px}.safety-result-row:last-child{border-bottom:0}
+.safety-result-row b{text-align:right;color:#294c43;max-width:60%}
+.safety-body [hidden],#test-detail[hidden]{display:none!important}
+.safety-body:has(.safety-video){bottom:142px}
+/* Approved compact checking/results layout. */
+.safety-detail .safety-body{bottom:110px}.safety-detail .safety-result{margin-top:18px}.safety-detail .safety-result[data-kind="risk"]{background:#fcf1ed}.safety-detail .safety-result[data-kind="risk"] strong{color:#9b433d}
+.safety-detail .safety-result-row{padding:9px 0;font-size:14px;gap:16px}.safety-detail .safety-result-row b{flex-shrink:0;max-width:52%;overflow-wrap:anywhere}.safety-detail .safety-result-row span{min-width:0}
+.safety-detail .safety-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}.safety-detail .safety-actions button{padding:0 10px}
+.qr-viewfinder{height:310px;border-radius:22px;background:#f3f4f8;position:relative;overflow:hidden;margin-top:4px}.qr-viewfinder video{width:100%;height:100%;object-fit:cover}.qr-message{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;gap:12px}.qr-message p{font-size:17px;font-weight:500;line-height:1.5}.qr-message button{background:#d7f6eb;border-radius:25px;padding:10px 24px}.qr-copy-fallback{width:100%;min-height:100px;border:1px solid #dce8e3;border-radius:12px;padding:10px}
+.safety-qr .safety-result p{white-space:pre-wrap;word-break:break-word}.safety-qr .safety-run{font-size:18px}.safety-detail button:disabled{cursor:default}
+@media(max-width:370px){.qr-viewfinder{height:260px}.safety-detail .safety-result-row{font-size:12px}.safety-detail .safety-body{padding-left:14px;padding-right:14px}}
+
+.qr-still{width:100%;height:100%;object-fit:contain;background:#f3f4f8}
+
+/* Unified safety shell, based on Wi-Fi Check. Scoped away from performance tabs. */
+.safety-detail .safety-art{height:160px;min-height:160px;box-sizing:border-box}
+.safety-detail .qr-viewfinder{height:310px;min-height:310px;margin:2px 0 20px;border:1px solid #e6efeb;border-radius:25px;display:block;background:radial-gradient(circle at 50% 30%,#ddf9ed,#f3f4f7 71%)}
+.safety-detail .qr-viewfinder video,.safety-detail .qr-still{position:absolute;inset:0;width:100%;height:100%}
+.safety-detail .qr-message{padding:12px 20px;gap:6px}
+.safety-detail .qr-message p{font-size:14px;line-height:1.4;margin:0;color:#53635e}
+.safety-detail .qr-message button{font-size:14px;line-height:20px;min-height:38px;padding:8px 20px}
+.safety-detail .safety-run{font-size:19px}
+.safety-detail .safety-link-field{margin-top:0}
+.safety-detail .qr-guide{display:none;position:absolute;width:128px;height:128px;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:1}
+.safety-detail .qr-viewfinder:has(video:not([hidden])) .qr-guide{display:block}
+.safety-detail .qr-guide i{position:absolute;width:18px;height:18px;border-color:white;border-style:solid;border-width:0;pointer-events:none;filter:drop-shadow(0 1px 2px #0009)}
+.safety-detail .qr-guide i:nth-child(1){left:0;top:0;border-left-width:2px;border-top-width:2px}
+.safety-detail .qr-guide i:nth-child(2){right:0;top:0;border-right-width:2px;border-top-width:2px}
+.safety-detail .qr-guide i:nth-child(3){left:0;bottom:0;border-left-width:2px;border-bottom-width:2px}
+.safety-detail .qr-guide i:nth-child(4){right:0;bottom:0;border-right-width:2px;border-bottom-width:2px}
+
+@media(max-width:370px){.safety-detail .qr-viewfinder{height:260px;min-height:260px}}
+
+/* Desktop debug-only camera demonstration; no fake permission or scan result. */
+.safety-detail .qr-demo-background{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.safety-detail .qr-demo-active .qr-guide{display:block}
+
+/* Taller camera only; keep permission and uploaded-result layouts unchanged. */
+.safety-qr .qr-viewfinder:is(.qr-demo-active,:has(video:not([hidden]))){height:min(358px,calc(100% - 22px));min-height:0}
+@media(max-width:370px){.safety-qr .qr-viewfinder:is(.qr-demo-active,:has(video:not([hidden]))){height:min(308px,calc(100% - 22px))}}
+@media(max-height:540px) and (max-width:440px){.safety-qr .safety-body:has(video:not([hidden]),.qr-demo-active){bottom:88px;padding-bottom:0}}

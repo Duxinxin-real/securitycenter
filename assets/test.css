@@ -1,0 +1,33 @@
+/* Geometry mapped from the approved 852 × 1846 artwork to its 393px app interior.
+   Utility glyphs use official Lucide SVG paths; no custom icon geometry. */
+[hidden]{display:none!important}
+#test-page{position:absolute;inset:54px 0 0;background:#fff}
+.test-header{position:absolute;top:0;left:0;right:0;height:80px;z-index:2;background:#fff}
+.test-header h1{font-size:28px;font-weight:600;letter-spacing:0}
+.test-scroll{position:absolute;inset:80px 0 0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:none;padding:0 14px;touch-action:pan-y}
+.test-scroll::-webkit-scrollbar{display:none}
+.test-heading{display:flex;align-items:center;gap:10px;height:30px;margin:0 6px 9px;font-size:20px;font-weight:750;line-height:26px;letter-spacing:-.3px;white-space:nowrap}
+.test-heading img{width:28px;height:26px;object-fit:contain;flex:none}
+.performance-list{display:grid;gap:12px}
+.performance-card{width:100%;height:109px;border-radius:16px;background:linear-gradient(115deg,#f5f6fa,#f3f4f8);display:flex;align-items:center;padding:0 20px 0 24px;text-align:left;gap:22px}
+.performance-icon{width:68px;height:68px;flex:none;border-radius:50%;display:grid;place-items:center;background:#e7f3ef}
+.performance-icon img{width:32px;height:32px;border-radius:0}
+.performance-copy{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
+.performance-copy strong{font-size:23px;line-height:30px;font-weight:650;letter-spacing:-.3px}
+.performance-copy>span{display:flex;align-items:center;gap:9px;color:#8b8e9e;font-size:17px;line-height:23px;white-space:nowrap;font-weight:500;letter-spacing:-.1px}
+.result-dot{display:block;flex:none;width:12px;height:12px;border-radius:50%;background:#daddE5}
+.result-dot.measured{background:#29d9b6}
+.test-chevron{width:12px;height:17px;object-fit:contain;flex:none;mix-blend-mode:multiply}
+.safety-section{margin-top:22px}
+.safety-section .test-heading{margin-bottom:11px}
+.safety-section .test-heading img{width:25px;height:27px;margin-right:3px}
+.safety-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 11px}
+.safety-card{height:107px;background:linear-gradient(115deg,#f5f6fa,#f3f4f8);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:13px 8px 10px;gap:8px}
+.safety-icon{width:54px;height:54px;flex:none;border-radius:50%;display:grid;place-items:center;background:#e7f3ef}
+.safety-icon img{width:28px;height:28px;border-radius:0}
+.safety-card strong{font-size:19px;line-height:24px;letter-spacing:-.2px;font-weight:650}
+.test-scroll-end{height:350px}
+.performance-card:active,.safety-card:active{background:#eaf1ef}
+.phone[data-tab="test"] .compact-header{display:none}
+.test-entry-icon{width:62px;height:62px;border-radius:50%;margin:0 0 16px;padding:16px;background:#e7f3ef}
+@media(max-width:370px){.performance-card{padding-left:17px;gap:16px}.performance-copy strong{font-size:21px}.performance-copy>span{font-size:15px}.test-heading{font-size:18px;gap:8px}}

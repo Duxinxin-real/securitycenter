@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Clean Web</title>
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/test.css">
+<link rel="stylesheet" href="assets/test-detail.css">
+<link rel="stylesheet" href="assets/vault.css?v=transparent-2">
+<link rel="stylesheet" href="assets/privacy.css">
+<link rel="stylesheet" href="assets/clean-guide.css?v=full-page-1">
+<link rel="stylesheet" href="assets/safety-detail.css">
+<link rel="stylesheet" href="assets/preview.css">
+<link rel="stylesheet" href="assets/calendar-completion.css">
+<link rel="stylesheet" href="assets/sms.css">
+</head>
+<body>
+<div class="device-wrap"><div class="device">
+ <main class="phone" data-tab="clean" aria-label="Clean Web prototype">
+  <div class="statusbar" aria-hidden="true"><img src="assets/icons/status.png" alt=""></div>
+  <div class="compact-header" aria-hidden="true" inert><span>Clean Web</span><button class="settings-trigger" aria-label="Settings"><img src="assets/icons/settings.png" alt=""></button></div>
+  <div class="scroll" id="clean-scroll">
+   <header class="page-header"><h1>Clean Web</h1><button class="settings-trigger" aria-label="Settings"><img src="assets/icons/settings.png" alt=""></button></header>
+   <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-heading"><h2 id="hero-title">Browsing Protection</h2><button id="hero-switch" class="switch" role="switch" aria-checked="false" aria-label="Web protection"></button></div>
+    <p class="scope">Safari protection</p>
+    <img class="hero-art" src="assets/hero-off.webp" width="1000" height="615" decoding="async" fetchpriority="high" alt="">
+    <div class="hero-state"><span class="state-dot"></span><span id="hero-state-text">Set up Safari protection</span></div>
+   </section>
+   <section class="controls" aria-labelledby="controls-title">
+    <div class="section-heading"><h2 id="controls-title">Content Blocking</h2><button class="text-action" id="manage">Setup Guide</button></div>
+    <div id="web-controls"></div>
+   </section>
+   <section class="tools" aria-labelledby="tools-title">
+    <h2 id="tools-title">Clean Tools</h2>
+    <div class="tool-list">
+     <button class="tool-card" data-tool="calendar"><img class="tool-icon" src="assets/icons/calendar.png" alt=""><span class="tool-copy"><strong>Calendar Clean</strong><span>Not scanned</span></span><img class="chevron" src="assets/icons/chevron.png" alt=""></button>
+     <button class="tool-card" data-tool="sms"><img class="tool-icon" src="assets/icons/sms.png" alt=""><span class="tool-copy"><strong>SafeSMS</strong><span>Off</span></span><img class="chevron" src="assets/icons/chevron.png" alt=""></button>
+     <button class="tool-card" data-tool="call"><img class="tool-icon" src="assets/icons/call.png" alt=""><span class="tool-copy"><strong>SafeCall</strong><span>Off</span></span><img class="chevron" src="assets/icons/chevron.png" alt=""></button>
+    </div>
+   </section>
+   <div class="scroll-end"></div>
+  </div>
+  <section id="test-page" hidden aria-label="Test overview">
+   <header class="page-header test-header"><h1>Test</h1><button class="settings-trigger" aria-label="Settings"><img src="assets/icons/settings.png" alt=""></button></header>
+   <div class="test-scroll" id="test-scroll">
+    <section class="performance-section" aria-labelledby="performance-title">
+     <h2 class="test-heading" id="performance-title"><img src="assets/test/performance-heading.svg" alt="">Performance Tests</h2>
+     <div class="performance-list">
+      <button class="performance-card" data-test="speed"><span class="performance-icon"><img src="assets/test/speed.svg" alt=""></span><span class="performance-copy"><strong>Speed</strong><span><i class="result-dot"></i>Not tested</span></span><img class="test-chevron" src="assets/test/chevron.svg" alt=""></button>
+      <button class="performance-card" data-test="cpu"><span class="performance-icon"><img src="assets/test/cpu.svg" alt=""></span><span class="performance-copy"><strong>CPU</strong><span><i class="result-dot"></i>Not tested</span></span><img class="test-chevron" src="assets/test/chevron.svg" alt=""></button>
+      <button class="performance-card" data-test="display"><span class="performance-icon"><img src="assets/test/display.svg" alt=""></span><span class="performance-copy"><strong>Display</strong><span><i class="result-dot"></i>Not tested</span></span><img class="test-chevron" src="assets/test/chevron.svg" alt=""></button>
+     </div>
+    </section>
+    <section class="safety-section" aria-labelledby="safety-title">
+     <h2 class="test-heading" id="safety-title"><img src="assets/test/safety-heading.svg" alt="">Safety Test Tool</h2>
+     <div class="safety-grid">
+      <button class="safety-card" data-test="link"><span class="safety-icon"><img src="assets/test/link.svg" alt=""></span><strong>Link</strong></button>
+      <button class="safety-card" data-test="qr"><span class="safety-icon"><img src="assets/test/qr.svg" alt=""></span><strong>QR Code</strong></button>
+      <button class="safety-card" data-test="wifi"><span class="safety-icon"><img src="assets/test/wifi.svg" alt=""></span><strong>Wi-Fi</strong></button>
+      <button class="safety-card" data-test="device"><span class="safety-icon"><img src="assets/test/device.svg" alt=""></span><strong>Device</strong></button>
+     </div>
+    </section>
+    <div class="test-scroll-end" aria-hidden="true"></div>
+   </div>
+  </section>
+  <section id="vault-page" hidden aria-label="Vault albums">
+   <header class="page-header vault-header"><h1>Vault</h1><button id="vault-lock" class="vault-icon" aria-label="Lock Vault" hidden><img src="assets/vault/lock-transparent.svg" alt=""></button></header>
+   <div class="vault-scroll" id="vault-scroll">
+    <section class="vault-trust" id="vault-trust" hidden><div class="vault-welcome-art" aria-hidden="true"><img src="assets/vault/onboarding-media-reference.png" alt=""></div><p>Lock your photos and videos.</p><button class="vault-primary" id="vault-intro-next">Continue</button></section>
+    <div id="vault-albums" hidden><div class="vault-section-heading"><h2>Albums</h2><button id="vault-new" aria-label="New Album"><img src="assets/vault/plus-transparent.svg" alt=""></button></div><div class="vault-grid" id="vault-grid"></div><div class="vault-footer"><button class="vault-add" id="vault-add"><img src="assets/vault/plus-transparent.svg" alt="">Add Media</button></div></div>
+   </div>
+  </section>
+  <section id="privacy-page" hidden aria-label="Privacy tools">
+   <header class="page-header privacy-header"><h1>Privacy</h1><button class="settings-trigger" aria-label="Settings"><img src="assets/icons/settings.png" alt=""></button></header>
+   <div class="privacy-scroll" id="privacy-scroll"><div class="privacy-cards">
+    <section class="privacy-card" aria-labelledby="privacy-scan-title"><div class="privacy-copy"><h2 id="privacy-scan-title">Privacy Scan</h2><p>Check multiple photos</p></div><img class="privacy-art" loading="lazy" decoding="async" src="assets/privacy/scan.png" alt=""><button class="privacy-choose" data-privacy="scan" aria-label="Select Photos for Privacy Scan">Select Photos</button></section>
+    <section class="privacy-card" aria-labelledby="privacy-redact-title"><div class="privacy-copy"><h2 id="privacy-redact-title">Auto Redact</h2><p>Hide sensitive text</p></div><img class="privacy-art" loading="lazy" decoding="async" src="assets/privacy/redact.png" alt=""><button class="privacy-choose" data-privacy="redact" aria-label="Choose Photo for Auto Redact">Choose Photo</button></section>
+    <section class="privacy-card" aria-labelledby="privacy-metadata-title"><div class="privacy-copy"><h2 id="privacy-metadata-title">Metadata Clean</h2><p>Remove photo details</p></div><img class="privacy-art" loading="lazy" decoding="async" src="assets/privacy/metadata.png" alt=""><button class="privacy-choose" data-privacy="metadata" aria-label="Select Photos for Metadata Clean">Select Photos</button></section>
+   </div><p class="privacy-note">Processed on device</p></div>
+  </section>
+  <section id="vault-pin-page" hidden aria-label="Vault passcode"></section>
+  <section id="clean-guide-detail" hidden aria-label="Setup tutorial"></section>
+  <section id="test-detail" hidden aria-label="Test detail"></section>
+  <section id="privacy-detail" hidden aria-label="Privacy detail"></section>
+  <nav class="tabbar" aria-label="Main navigation">
+   <button class="tab active" id="clean-tab" aria-current="page"><img src="assets/icons/tab-clean.png" alt=""><span>Clean</span></button>
+   <button class="tab" id="test-tab" aria-label="Test"><img src="assets/icons/tab-test.png" alt=""><span>Test</span></button>
+   <button class="master" id="web-master" aria-label="Web protection: Set Up"><span class="master-circle"><img src="assets/icons/shield.png" alt=""></span><span id="master-label">Set Up</span></button>
+   <button class="tab" id="vault-tab" aria-label="Vault"><img src="assets/icons/tab-vault.png" alt=""><span>Vault</span></button>
+   <button class="tab" id="privacy-tab" aria-label="Privacy"><img src="assets/icons/tab-privacy.png" alt=""><span>Privacy</span></button>
+  </nav>
+  <div class="modal-root" id="modal-root" hidden><div class="scrim"></div><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="sheet-handle"></div><div id="sheet-content"></div></section></div>
+ </main>
+</div></div>
+<script src="assets/test-detail.js"></script>
+<script src="assets/vault.js"></script>
+<script src="assets/private-ocr.js"></script>
+<script src="assets/privacy.js"></script>
+<script src="assets/platform.js"></script>
+<script src="assets/guide-scenes.js"></script>
+<script src="assets/clean-guide.js?v=own-guides-1"></script>
+<script src="assets/reputation.js"></script>
+<script src="assets/safety-detail.js"></script>
+<script src="assets/calendar.js"></script>
+<script src="assets/preview.js"></script>
+<script src="assets/sms.js"></script>
+<script src="assets/app.js?v=debug-calendar-1"></script>
+<script src="assets/vault-page-spec.js"></script>
+</body>
+</html>
