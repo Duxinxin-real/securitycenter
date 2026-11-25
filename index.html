@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="assets/app.css">
 <link rel="stylesheet" href="assets/test.css">
 <link rel="stylesheet" href="assets/test-detail.css">
-<link rel="stylesheet" href="assets/vault.css?v=transparent-2">
+<link rel="stylesheet" href="assets/vault.css?v=empty-1">
 <link rel="stylesheet" href="assets/privacy.css">
 <link rel="stylesheet" href="assets/clean-guide.css?v=full-page-1">
 <link rel="stylesheet" href="assets/safety-detail.css">
@@ -69,7 +69,7 @@
    <header class="page-header vault-header"><h1>Vault</h1><button id="vault-lock" class="vault-icon" aria-label="Lock Vault" hidden><img src="assets/vault/lock-transparent.svg" alt=""></button></header>
    <div class="vault-scroll" id="vault-scroll">
     <section class="vault-trust" id="vault-trust" hidden><div class="vault-welcome-art" aria-hidden="true"><img src="assets/vault/onboarding-media-reference.png" alt=""></div><p>Lock your photos and videos.</p><button class="vault-primary" id="vault-intro-next">Continue</button></section>
-    <div id="vault-albums" hidden><div class="vault-section-heading"><h2>Albums</h2><button id="vault-new" aria-label="New Album"><img src="assets/vault/plus-transparent.svg" alt=""></button></div><div class="vault-grid" id="vault-grid"></div><div class="vault-footer"><button class="vault-add" id="vault-add"><img src="assets/vault/plus-transparent.svg" alt="">Add Media</button></div></div>
+    <div id="vault-albums" hidden><div class="vault-section-heading"><h2>Albums</h2><button id="vault-new" aria-label="New Album"><img src="assets/vault/plus-transparent.svg" alt=""></button></div><div class="vault-grid" id="vault-grid"></div><section id="vault-empty-state" class="vault-empty-state" hidden><img src="assets/vault/empty-tray.png" width="540" height="360" alt=""><h2>No albums yet</h2></section><div class="vault-footer"><button class="vault-add" id="vault-add"><img src="assets/vault/plus-transparent.svg" alt="">Add Media</button></div></div>
    </div>
   </section>
   <section id="privacy-page" hidden aria-label="Privacy tools">
@@ -95,7 +95,7 @@
  </main>
 </div></div>
 <script src="assets/test-detail.js"></script>
-<script src="assets/vault.js"></script>
+<script src="assets/vault.js?v=empty-1"></script>
 <script src="assets/private-ocr.js"></script>
 <script src="assets/privacy.js?v=document-ocr-1"></script>
 <script src="assets/platform.js"></script>
@@ -107,6 +107,6 @@
 <script src="assets/preview.js?v=document-ocr-1"></script>
 <script src="assets/sms.js"></script>
 <script src="assets/app.js?v=debug-calendar-1"></script>
-<script src="assets/vault-page-spec.js"></script>
+<script src="assets/vault-page-spec.js?v=empty-1"></script>
 </body>
 </html>

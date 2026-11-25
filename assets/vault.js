@@ -12,7 +12,7 @@ window.initVault=({open,close})=>{
  const state={profile:{},key:null,active:null,album:null,version:0,revision:null,transactions:new Set(),urls:[],data:{private:[],decoy:[]}};
  let profileError=false;
  try{const p=readProfiles();if(!p||Array.isArray(p)||typeof p!=='object')throw Error('Invalid profile');for(const m of modes)if(p[m]){if(!p[m].salt||!p[m].iv||!p[m].proof)throw Error('Invalid profile');state.profile[m]=p[m];}}catch{profileError=true;}
- const emptyAlbums=m=>(onboardingPreview?samples[m].slice(0,m==='private'?2:1):samples[m]).map(([cover,name])=>({id:crypto.randomUUID(),cover,name,items:[]}));
+ const emptyAlbums=m=>(publicPreview?[]:onboardingPreview?samples[m].slice(0,m==='private'?2:1):samples[m]).map(([cover,name])=>({id:crypto.randomUUID(),cover,name,items:[]}));
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const ready=()=>Boolean(crypto.subtle),bytes=x=>new Uint8Array(x),vector=()=>crypto.getRandomValues(new Uint8Array(12));
  const back='<button class="detail-back" aria-label="Back"><img src="assets/test/detail-back.svg" alt=""></button>';
@@ -97,7 +97,7 @@ window.initVault=({open,close})=>{
   const keys=await Promise.all(modes.map(m=>verify(m,pin)));if(!valid())return;const i=keys.findIndex(Boolean);
   if(i>=0){attempts=0;until=0;await unlock(modes[i],keys[i]);return;}if(++attempts>=5){until=Date.now()+30000;attempts=0;}throw Error('Incorrect passcode.');
  }});}
- function render(){if(!state.active)return;release();$('#vault-grid').innerHTML=state.data[state.active].map(a=>`<button class="vault-album" data-album="${a.id}"><span class="vault-cover ${a.cover==='videos'?'vault-video-cover':''}"><img src="assets/vault/${esc(a.cover)}.png" alt=""></span><strong>${esc(a.name)}</strong><span class="album-count">${a.items.length} ${a.items.length===1?'item':'items'}</span></button>`).join('');}
+ function render(){if(!state.active)return;release();const albums=state.data[state.active],empty=!albums.length;$('#vault-albums').classList.toggle('is-empty',empty);$('#vault-empty-state').hidden=!empty;$('#vault-grid').hidden=empty;$('#vault-grid').innerHTML=albums.map(a=>`<button class="vault-album" data-album="${a.id}"><span class="vault-cover ${a.cover==='videos'?'vault-video-cover':''}"><img src="assets/vault/${esc(a.cover)}.png" alt=""></span><strong>${esc(a.name)}</strong><span class="album-count">${a.items.length} ${a.items.length===1?'item':'items'}</span></button>`).join('');}
  async function showAlbum(id){if(!state.active)return;close();release();hidePanel();state.album=id;const a=current();if(!a)return;const version=state.version,key=state.key;panel.hidden=false;page.inert=true;phone.classList.add('detail-open');
   panel.innerHTML=`<header class="vault-album-header">${back}<h1>${esc(a.name)}</h1><button class="vault-icon" id="vault-more" aria-label="Album options"><img src="assets/vault/more.svg" alt=""></button></header><div class="vault-media" id="vault-media">${a.items.length?'':'<p class="vault-empty">No photos or videos yet</p>'}</div><footer class="vault-pin-footer"><button class="vault-primary" id="vault-album-add">${icon('plus-transparent.svg')}Add Media</button></footer>`;
   panel.querySelector('.detail-back').onclick=()=>{close();hidePanel();state.album=null;render();};$('#vault-more').onclick=()=>{open('<div id="vault-menu"><h2 id="sheet-title" class="vault-sheet-title">Album options</h2><button class="sheet-action" id="vault-rename">Rename Album</button><button class="sheet-action secondary" data-action="close">Cancel</button></div>');$('#vault-rename').onclick=()=>nameForm(a);};$('#vault-album-add').onclick=()=>addMedia(a);
@@ -111,11 +111,11 @@ window.initVault=({open,close})=>{
    catch(e){if(valid())$('#vault-name-error').textContent=e.message||'Could not save. Try again.';}finally{if(valid()){input.disabled=false;update();}}
   };
  }
- function addMedia(album){if(!state.active)return;const mode=state.active,key=state.key,version=state.version,all=state.data[mode];
-  open(`<button class="close-button" data-action="close">Cancel</button><h2 id="sheet-title">Add Media</h2>${album?'':`<label for="vault-destination">Album</label><select id="vault-destination">${all.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('')}</select>`}<button class="sheet-action" id="vault-choose">Choose Media</button><input type="file" id="vault-files" accept="image/*,video/*" multiple hidden><p id="vault-import-status" role="status"></p>`);
+ function addMedia(album){if(!state.active)return;const mode=state.active,key=state.key,version=state.version,all=state.data[mode],first=!album&&!all.length?{id:crypto.randomUUID(),name:'Personal',cover:'personal',items:[]}:null;
+  open(`<button class="close-button" data-action="close">Cancel</button><h2 id="sheet-title">Add Media</h2>${album||first?'':`<label for="vault-destination">Album</label><select id="vault-destination">${all.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('')}</select>`}<button class="sheet-action" id="vault-choose">Choose Media</button><input type="file" id="vault-files" accept="image/*,video/*" multiple hidden><p id="vault-import-status" role="status"></p>`);
   const input=$('#vault-files'),choose=$('#vault-choose'),status=$('#vault-import-status');choose.onclick=()=>input.click();input.onchange=async()=>{
-   const valid=()=>state.active===mode&&version===state.version&&status.isConnected;const target=album||all.find(a=>a.id===$('#vault-destination').value);if(!target||!valid())return;choose.disabled=true;let skipped=0;
-   const next=structuredClone(state.data[mode]),destination=next.find(a=>a.id===target.id),encrypted=[];
+   const valid=()=>state.active===mode&&version===state.version&&status.isConnected;const target=album||first||all.find(a=>a.id===$('#vault-destination').value);if(!target||!valid())return;choose.disabled=true;let skipped=0;
+   const next=structuredClone(state.data[mode]);if(first&&!next.some(a=>a.id===first.id))next.push(structuredClone(first));const destination=next.find(a=>a.id===target.id),encrypted=[];
    try{for(const f of input.files){if(!valid())return;if(!/^(image|video)\//.test(f.type)||f.size>40*1024*1024){skipped++;continue;}const id=crypto.randomUUID(),record=await seal(key,await f.arrayBuffer(),id);if(!valid())return;encrypted.push(record);destination.items.push({id,type:f.type});}
     if(!valid())return;if(encrypted.length){const revision=await writeCatalog(state.profile[mode].catalogId,key,next,state.revision,encrypted,valid);if(!valid())return;state.data[mode]=next;state.revision=revision;}
     if(skipped){status.textContent='Some files could not be added. Try media under 40 MB.';return;}close();album?showAlbum(album.id):render();
@@ -123,7 +123,7 @@ window.initVault=({open,close})=>{
   };
  }
  $('#vault-intro-next').onclick=twoWays;$('#vault-new').onclick=()=>nameForm();$('#vault-add').onclick=()=>addMedia();$('#vault-lock').onclick=()=>lock();$('#vault-grid').onclick=e=>{const b=e.target.closest('[data-album]');if(b)showAlbum(b.dataset.album);};
- document.addEventListener('visibilitychange',()=>{if(document.hidden&&!page.hidden)lock();});window.addEventListener('pagehide',()=>{if(!page.hidden)lock(false);});window.addEventListener('popstate',()=>{if(!page.hidden)lock();});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden&&!page.hidden)lock();});window.addEventListener('pagehide',()=>{if(!page.hidden)lock(false);});window.addEventListener('popstate',()=>{if(!page.hidden&&!/^#vault(?:\/|$)/.test(location.hash))lock();});
  // Desktop-only companion controls live outside the app and outside preview.js draw().
  if(!document.getElementById('vault-trial-tools')){
   const tools=document.createElement('aside');tools.id='vault-trial-tools';tools.hidden=true;tools.setAttribute('aria-label','Vault 试玩入口');

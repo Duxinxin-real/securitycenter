@@ -8,6 +8,7 @@
     unlock:['解锁保险箱',[['输入密码','输入六位数字后才能点 Unlock。Delete 删除最后一位。'],['解锁','打开该密码对应的相册。'],['输入错误','提示重试；连续五次错误后需等 30 秒。']]],
     set:['设置密码',[['输入','输入六位数字，点 Continue 进入确认。'],['备用密码','可跳过；若设置，须与主密码不同。']]],
     confirm:['确认密码',[['再次输入','输入相同的六位密码后保存。'],['两次不一致','保留当前步骤，重新输入。']]],
+    empty:['Vault 空状态',[['初次解锁','没有相册时显示 No albums yet，不预建相册。'],['Add Media','选择照片或视频，成功导入后创建第一个相册；取消不会创建。'],['锁定','点右上角锁定。离开页面或浏览器进入后台时也会锁定。']]],
     albums:['Vault 相册',[['查看相册','显示相册封面、名称及媒体数量。'],['添加','点加号新建相册，或点 Add Media 选择照片或视频。'],['锁定','点右上锁定；再次查看时需输入密码。']]],
     album:['相册内容',[['查看','打开照片或播放视频；没有内容时显示 No photos or videos yet。'],['添加与改名','点 Add Media 添加；相册菜单可改名。']]],
     name:['相册名称',[['输入名称','输入非空名称后保存。'],['保存失败','保留当前输入，可重新保存。']]],
@@ -36,7 +37,7 @@
       if(heading.startsWith('Set'))return 'set';
       if(pin.querySelector('#vault-retry'))return 'dismiss';
     }
-    if(isShown(main.querySelector('#vault-albums')))return 'albums';
+    if(isShown(main.querySelector('#vault-albums')))return isShown(main.querySelector('#vault-empty-state'))?'empty':'albums';
     if(isShown(main.querySelector('#vault-trust')))return 'intro';
     return '';
   };

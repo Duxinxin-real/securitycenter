@@ -51,3 +51,11 @@ body:has(.phone[data-tab="vault"]) .preview-mobile-toggle{display:none!important
 #vault-trial-tools button:hover{background:#e8f7f0}
 body:has(#vault-trial-tools:not([hidden])) .preview-left{display:none!important}
 @media(max-width:700px){#vault-trial-tools{display:none!important}}
+
+/* New Vault spaces begin empty; the footer stays accessible above the tab bar. */
+#vault-albums.is-empty{min-height:100%;display:flex;flex-direction:column}
+#vault-albums.is-empty .vault-section-heading,#vault-grid[hidden],#vault-empty-state[hidden]{display:none}
+.vault-empty-state{min-height:245px;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:17px;text-align:center;padding:28px 8px 14px}
+.vault-empty-state img{width:min(67%,247px);height:auto;aspect-ratio:3/2;object-fit:contain}
+.vault-empty-state h2{font-size:22px;line-height:1.2;color:#303745;letter-spacing:-.3px;font-weight:700}
+#vault-albums.is-empty .vault-footer{padding-top:12px;padding-bottom:5px}
