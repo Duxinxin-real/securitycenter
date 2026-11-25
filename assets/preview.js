@@ -1,5 +1,5 @@
 (() => {
- const $=s=>document.querySelector(s);let context='clean',state='',calendarState={};
+ const $=s=>document.querySelector(s);let context='clean',state='',calendarState={},calendarChoices={};
  const docs={
   "clean": [
     "CleanTab",
@@ -733,7 +733,7 @@
  if(context==='calendar'){
  const {stage,permission}=calendarState;
  const add=(id,label)=>btn(label,()=>window.calendarPreview.fixture(id));
- const choice=(label,options)=>{const field=document.createElement('label');field.textContent=label;const select=document.createElement('select');select.setAttribute('aria-label',label);select.style.cssText='display:block;width:100%;min-height:38px;margin-top:6px;padding:8px;border:1px solid #dbe6e0;border-radius:10px;background:white;font:inherit';const prompt=new Option('请选择模拟条件','');prompt.disabled=true;prompt.selected=true;select.add(prompt);options.forEach(([value,text])=>select.add(new Option(text,value)));select.onchange=()=>window.calendarPreview.fixture(select.value);field.append(select);left.querySelector('.debug-buttons').append(field);};
+ const choice=(label,options)=>{const field=document.createElement('label');field.textContent=label;const select=document.createElement('select');select.setAttribute('aria-label',label);select.style.cssText='display:block;width:100%;min-height:38px;margin-top:6px;padding:8px;border:1px solid #dbe6e0;border-radius:10px;background:white;font:inherit';const prompt=new Option('请选择模拟条件','');prompt.disabled=true;prompt.selected=true;select.add(prompt);options.forEach(([value,text])=>select.add(new Option(text,value)));select.value=calendarChoices[label]||'';select.onchange=()=>{calendarChoices[label]=select.value;window.calendarPreview.fixture(select.value);};field.append(select);left.querySelector('.debug-buttons').append(field);};
  if(['ready','denied','restricted'].includes(stage)){
   if(stage==='ready')add('restricted','模拟系统限制');
   if(stage!=='ready'||permission!=='notDetermined')add('reset-permission','重试首次授权（模拟）');
@@ -766,6 +766,6 @@
  }
  const performancePage=document.querySelector('#test-detail');if(performancePage)new MutationObserver(()=>{if(['speed','cpu','display'].includes(context))left.hidden=!!performancePage.querySelector('.test-history-list');}).observe(performancePage,{childList:true,subtree:true});
  window.addEventListener('test-preview-mode',e=>{left.querySelector('.test-sample-label')?.remove();if(e.detail.sample){const label=document.createElement('p');label.className='preview-state test-sample-label';label.textContent='当前为样例演示';left.querySelector('h2').after(label);}});
- window.addEventListener('load',draw);
- window.addEventListener('preview-context',e=>{context=e.detail.key;state=e.detail.state||'';if(context==='calendar')calendarState=e.detail;draw();});draw();
+ window.addEventListener('load',()=>{if(context==='clean')draw();});
+ window.addEventListener('preview-context',e=>{context=e.detail.key;state=e.detail.state||'';if(context==='calendar'){if(calendarState.stage!==e.detail.stage)calendarChoices={};calendarState=e.detail;}draw();});draw();
 })();
