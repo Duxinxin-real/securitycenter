@@ -133,9 +133,16 @@ window.initVault=({open,close})=>{
   restore.onclick=()=>{if(location.href===trial.href)location.reload();else location.assign(trial.href);};tools.append(restore);
   if(onboardingPreview&&!publicPreview){const original=document.createElement('button');original.id='vault-return-original';original.textContent='返回原 Vault';original.onclick=()=>location.assign(ordinary.href);tools.append(original);}
   document.body.append(tools);let externalContext=phone.dataset.tab||'clean';
-  const position=()=>{const rect=phone.getBoundingClientRect(),left=rect.left-204;tools.hidden=externalContext!=='vault'||phone.dataset.tab!=='vault'||page.hidden||innerWidth<=700||left<12;if(tools.hidden)return;tools.style.left=left+'px';tools.style.top=Math.max(20,Math.min(innerHeight-130,rect.top+rect.height/2-42))+'px';};
+  const position=()=>{
+   const rect=phone.getBoundingClientRect(),scale=rect.width/393,gap=Math.round(34*scale),width=Math.round(180*scale),left=rect.left-gap-width;
+   tools.hidden=externalContext!=='vault'||phone.dataset.tab!=='vault'||page.hidden||innerWidth<=700||left<12;
+   if(tools.hidden)return;
+   tools.style.width=width+'px';
+   tools.style.left=left+'px';
+   tools.style.top=(rect.top+60*scale)+'px';
+  };
   window.addEventListener('preview-context',e=>{externalContext=e.detail.key;queueMicrotask(position);});
-  window.addEventListener('resize',position);new MutationObserver(position).observe(phone,{attributes:true,attributeFilter:['data-tab']});queueMicrotask(position);
+  window.addEventListener('resize',position);window.addEventListener('scroll',position,{passive:true});new ResizeObserver(position).observe(phone);new MutationObserver(position).observe(phone,{attributes:true,attributeFilter:['data-tab']});queueMicrotask(position);
  }
  // BFCache restores an old document; a full return to this explicit trial starts fresh too.
  if(onboardingPreview)window.addEventListener('pageshow',e=>{if(e.persisted)location.reload();});
