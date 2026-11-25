@@ -40,23 +40,89 @@ window.initPrivacy=()=>{
   if(bw<18||bh<8||bw/bh<2||bw>.97*w||bh>.68*h)return false;
   return /^(?:[0-9]{1,2}[A-Z]{2,3}[0-9]{2,4}|[A-Z]{2,3}[0-9]{2,4}|[0-9]{2,4}[A-Z]{2,3}|[A-Z]{2}[0-9]{2}[A-Z]{3})$/.test(code);
  }
+ const ocrText=line=>String(line.text||'').trim().replace(/\s+/g,' ');
+ const ocrWords=line=>(line.words||[]).filter(q=>q.bbox&&ocrText(q));
+ const mergeOCR=boxes=>({x0:Math.min(...boxes.map(b=>b.x0)),y0:Math.min(...boxes.map(b=>b.y0)),x1:Math.max(...boxes.map(b=>b.x1)),y1:Math.max(...boxes.map(b=>b.y1))});
+ const identityDoc=/\b(?:proof\s+of\s+age\s+card|identity\s+card|identification\s+card|national\s+id|driver'?s?\s+licen[cs]e|passport)\b/i;
+ const birthField=/\b(?:d\.?o\.?b\.?|date\s+of\s+birth|birth\s+date)\b/i;
+ const cardDate=/\b(?:[0-3]?\d\s*(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s*(?:19|20)\d{2}|(?:19|20)\d{2}[-/.][01]?\d[-/.][0-3]?\d|[0-3]?\d[-/.][0-3]?\d[-/.](?:19|20)\d{2})\b/i;
+ function validCNID(code){
+  if(!/^[1-9]\d{16}[\dX]$/.test(code))return false;
+  const y=+code.slice(6,10),m=+code.slice(10,12),d=+code.slice(12,14);
+  const date=new Date(Date.UTC(y,m-1,d)),weights=[7,9,10,5,8,4,2,1,6,3,7,9,10,5,8,4,2];
+  return y>=1900&&y<=new Date().getUTCFullYear()&&date.getUTCFullYear()===y&&date.getUTCMonth()===m-1&&date.getUTCDate()===d&&'10X98765432'[weights.reduce((n,v,i)=>n+v*+code[i],0)%11]===code[17];
+ }
+ function documentFields(rows,h){
+  const result=[],doc=rows.find(r=>identityDoc.test(ocrText(r))),proof=doc&&/proof\s+of\s+age/i.test(ocrText(doc));
+  const dates=[];
+  for(const r of rows){
+   const text=ocrText(r),words=ocrWords(r);
+   if(!r.bbox)continue;
+   const numbers=words.map((q,i)=>({q,i,text:ocrText(q).replace(/^[^A-Z0-9]+|[^A-Z0-9]+$/gi,'')}));
+   for(let a=0;a<numbers.length;a++){
+    let code='';
+    for(let b=a;b<numbers.length&&b<a+7;b++){
+     if(!/^\d[\dXx-]*$/.test(numbers[b].text))break;
+     code+=numbers[b].text.replace(/-/g,'').toUpperCase();
+     if(code.length>18)break;
+     const labelled=/\b(?:document|card|passport|licen[cs]e|id)\s*(?:no\.?|number|#)\s*[:#-]?/i.test(text);
+     if(validCNID(code)||(doc&&((proof&&code.length===16&&/^\d+$/.test(code))||(labelled&&code.length>=6&&code.length<=16&&/^\d+$/.test(code))))){
+      result.push({bbox:mergeOCR(numbers.slice(a,b+1).map(v=>v.q.bbox)),type:'id-number'});a=b;break;
+     }
+    }
+   }
+   if(doc&&cardDate.test(text)){
+    let dateBox=r.bbox;
+    outer:for(let i=0;i<words.length;i++){
+     for(let j=i;j<words.length&&j<i+4;j++){
+      if(cardDate.test(words.slice(i,j+1).map(ocrText).join(' '))){dateBox=mergeOCR(words.slice(i,j+1).map(v=>v.bbox));break outer;}
+     }
+    }
+    const v={bbox:dateBox,type:birthField.test(text)?'birth-date':'id-date'};dates.push(v);result.push(v);
+   }
+   if(doc&&/^\s*(?:(?:full|given|first|last)\s+)?(?:name|surname)\s*[:.-]?\s+[A-Z][A-Za-z'-]+(?:\s+[A-Z][A-Za-z'-]+){0,4}\s*$/.test(text)){
+    const where=words.findIndex(q=>/^(?:name|surname)[:.-]?$/i.test(ocrText(q)));
+    if(where>=0&&where<words.length-1)result.push({bbox:mergeOCR(words.slice(where+1).map(q=>q.bbox)),type:'id-name'});
+   }
+  }
+  // On an identified proof-of-age card, adjacent title-case lines aligned above the date are a name candidate.
+  if(proof&&dates.length){
+   const first=dates.sort((a,b)=>a.bbox.y0-b.bbox.y0)[0].bbox;
+   const names=rows.filter(r=>r.bbox&&r.confidence>=10&&/^[A-Z][a-z'-]{2,}(?: [A-Z][a-z'-]{2,}){0,2}$/.test(ocrText(r))&&
+    r.bbox.y1<first.y0&&first.y0-r.bbox.y1<h*.28&&r.bbox.y0>doc.bbox.y1&&Math.abs(r.bbox.x0-first.x0)<3*(first.y1-first.y0));
+   if(names.length===2&&names.some(r=>r.confidence>=86)&&Math.abs(names[0].bbox.x0-names[1].bbox.x0)<(first.y1-first.y0))result.push({bbox:mergeOCR(names.map(r=>r.bbox)),type:'id-name'});
+  }
+  return result;
+ }
  async function detect(file){
   return withImage(file,async(source,ow,oh)=>{
    const canvas=document.createElement('canvas');
    const raster=(scale)=>{canvas.width=Math.round(ow*scale);canvas.height=Math.round(oh*scale);canvas.getContext('2d').drawImage(source,0,0,canvas.width,canvas.height);};
    const lines=data=>(data.blocks||[]).flatMap(b=>(b.paragraphs||[]).flatMap(p=>p.lines||[]));
-   const collect=(rows,onlyPlate)=>rows.flatMap(line=>{
-    const w=canvas.width,h=canvas.height,b=line.bbox,plate=isPlateLine(line,w,h);
-    if(!b||(!plate&&(onlyPlate||!signal(line.text))))return [];
-    const pad=plate?Math.max(3,Math.round((b.y1-b.y0)*.065)):3;
-    const x=Math.max(0,b.x0-pad),y=Math.max(0,b.y0-pad),right=Math.min(w,b.x1+pad),bottom=Math.min(h,b.y1+pad);
-    return right>x&&bottom>y?[{x:x/w,y:y/h,width:(right-x)/w,height:(bottom-y)/h,...(plate?{type:'plate'}:{})}]:[];
-   });
+   const overlaps=(r,q)=>{
+    const w=Math.max(0,Math.min(r.x+r.width,q.x+q.width)-Math.max(r.x,q.x)),h=Math.max(0,Math.min(r.y+r.height,q.y+q.height)-Math.max(r.y,q.y));
+    return w*h>.55*Math.min(r.width*r.height,q.width*q.height);
+   };
+   const collect=(rows,secondary)=>{
+    const w=canvas.width,h=canvas.height;
+    const rect=(b,type,pad)=>{
+     const x=Math.max(0,b.x0-pad),y=Math.max(0,b.y0-pad),right=Math.min(w,b.x1+pad),bottom=Math.min(h,b.y1+pad);
+     return right>x&&bottom>y?{x:x/w,y:y/h,width:(right-x)/w,height:(bottom-y)/h,...(type?{type}:{})}:null;
+    };
+    const doc=documentFields(rows,h).map(r=>rect(r.bbox,r.type,4)).filter(Boolean);
+    const text=rows.flatMap(line=>{
+     const b=line.bbox,plate=isPlateLine(line,w,h);
+     if(!b||(!plate&&(secondary||!signal(line.text))))return [];
+     const mark=rect(b,plate?'plate':null,plate?Math.max(3,Math.round((b.y1-b.y0)*.065)):3);
+     return mark&&!doc.some(q=>overlaps(mark,q))?[mark]:[];
+    });
+    return [...doc,...text];
+   };
    try{
     const initial=Math.min(1,1800/Math.max(ow,oh));raster(initial);
     const first=await deadline((async()=>{const worker=await window.privateOCR.get();return {worker,pass:await worker.recognize(canvas,{}, {blocks:true,text:false})};})(),60000,'Text recognition timed out. Retry or cover manually.',()=>window.privateOCR?.stop());
-    const regular=collect(lines(first.pass.data),false);
-    if(regular.some(r=>r.type==='plate')||ow<140||oh<45)return regular;
+    const initialRows=lines(first.pass.data),regular=collect(initialRows,false);
+    if((regular.some(r=>r.type==='plate')&&!initialRows.some(r=>identityDoc.test(ocrText(r))))||ow<140||oh<45)return regular;
     raster(Math.min(2,1800/Math.max(ow,oh)));
     // Sparse layout helps high-contrast lettering on coloured, bordered plates.
     // Restore the standard mode before another photo uses the worker.
@@ -65,12 +131,12 @@ window.initPrivacy=()=>{
      await first.worker.setParameters({tessedit_pageseg_mode:'11'});
      try{return await first.worker.recognize(canvas,{}, {blocks:true,text:false});}
      finally{await first.worker.setParameters({tessedit_pageseg_mode:'6'});}
-    })(),15000,'Plate recognition timed out.',()=>window.privateOCR?.stop());}
+    })(),15000,'Document text recognition timed out.',()=>window.privateOCR?.stop());}
     catch(error){if(regular.length)return regular;throw error;}
-    return [...regular,...collect(lines(platePass.data),true).filter(r=>!regular.some(q=>{
-     const w=Math.max(0,Math.min(r.x+r.width,q.x+q.width)-Math.max(r.x,q.x)),h=Math.max(0,Math.min(r.y+r.height,q.y+q.height)-Math.max(r.y,q.y));
-     return w*h>.6*Math.min(r.width*r.height,q.width*q.height);
-    }))];
+    const extra=collect(lines(platePass.data),true);
+    const docExtra=extra.filter(r=>r.type.startsWith('id-')||r.type==='birth-date');
+    const keep=regular.filter(r=>!docExtra.some(q=>overlaps(r,q)));
+    return [...keep,...extra.filter(r=>!keep.some(q=>overlaps(r,q)))];
    }finally{canvas.width=canvas.height=1;}
   });
  }
