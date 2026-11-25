@@ -731,22 +731,41 @@
 
  if(['clean','web','calendar','calendar-guide','sms','sms-guide','sms-rules','sms-find','call','call-guide','call-list','call-add'].includes(context)){const note=document.createElement('p');note.className='preview-fixture-note';note.textContent='演示状态与本地样例；不读取日历、短信或通话。';left.append(note);}
  if(context==='calendar'){
- [['unauthorized','首次未授权'],['permission','授权弹窗'],['denied','授权被拒绝'],['restricted','系统限制'],['ready','已授权 · 未扫描'],['scanning','扫描中'],['results','有匹配内容'],['empty-calendar','范围内无事件'],['empty','没有匹配'],['scan-failed','扫描失败'],['detail','事件详情'],['readonly','只读事件'],['confirm','单次删除确认'],['deleting','删除中'],['partial','部分删除失败'],['delete-failed','全部删除失败'],['done','删除完成'],['reset','重置演示数据']].forEach(([s,l])=>btn(l,()=>window.calendarPreview.debug(s)));return;}
- if(context==='clean'){[['off','全部关闭'],['partial','部分开启'],['on','全部开启'],['unknown','状态查询失败'],['save-failed','规则更新失败']].forEach(([s,l])=>btn(l,()=>window.previewApp.web(s)));}
- else if(['sms','call'].includes(context)){const c=window[context+'Controller'];btn(context==='sms'?'首次设置':'扩展关闭',()=>c.debug('off'));btn(context==='sms'?'规则已配置':'扩展开启',()=>c.debug('on'));btn(context==='sms'?'设置返回（不可查询）':'系统状态未知',()=>c.debug('unknown'));}
- else if(context==='sms-rules'){btn('全部开启',()=>window.smsController.debug('rules-on'));btn('全部关闭',()=>window.smsController.debug('rules-off'));btn('保存失败',()=>window.smsController.debug('save-failed'));btn('下次保存失败',()=>window.smsController.debug('fail-next-save'));}
- else if(context==='call-list'){[['empty','空名单'],['populated','有号码'],['waiting','等待启用'],['syncing','同步中'],['failed','同步失败'],['synced','同步成功']].forEach(([v,l])=>btn(l,()=>window.callController.debug(v)));}
- else if(['web','sms-guide','call-guide','calendar-guide'].includes(context)){btn('打开设置失败',()=>window.cleanGuidePreview.fail());}
- else if(context==='call-add'){btn('保存失败',()=>window.callController.debug('fail-next-save'));}
- else if(context==='sms-find'){left.hidden=true;}
- else if(['web','sms-guide','call','test','privacy'].includes(context)){left.hidden=true;}
- else if(['speed','cpu','display'].includes(context)){btn('演示过程',()=>window.testDetailController.debug('run'));btn('测试中',()=>window.testDetailController.debug('checking'));btn('失败 / 重试',()=>window.testDetailController.debug('fail'));btn('历史记录',()=>window.testDetailController.debug('history'));}
- else if(context==='link'){[['live','实际离线查询'],['checking','检查中'],['clear','演示：未发现已知风险'],['risk','演示：发现风险'],['failure','演示：无法判断']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));}
- else if(context==='qr'){[['camera-preview','相机取景'],['denied','权限拒绝'],['failure','无二维码'],['text','非链接内容'],['checking','网址检查中']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));}
- else if(['wifi','device'].includes(context)){[['checking','检查中'],['complete','演示：完成'],['risk','演示：风险'],['failure','演示：检查失败']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));if(context==='wifi')btn('演示：未连接 Wi-Fi',()=>window.safetyPreview.debug('offline'));}
- else if(context==='vault'){left.hidden=true;}
- else if(['scan','redact','metadata'].includes(context)){btn('选择文件 · 实际本地处理',()=>$('#privacy-detail input[type=file]')?.click());btn('开始处理 / 保存副本',()=>click('#privacy-process'));if(context==='redact'){btn('识别文字区域',()=>click('#find-regions'));btn('撤销遮盖',()=>click('#undo-region'));}btn('取消处理',()=>click('.privacy-cancel'));}
+ const {stage,permission}=calendarState;
+ const add=(id,label)=>btn(label,()=>window.calendarPreview.fixture(id));
+ const choice=(label,options)=>{const field=document.createElement('label');field.textContent=label;const select=document.createElement('select');select.setAttribute('aria-label',label);select.style.cssText='display:block;width:100%;min-height:38px;margin-top:6px;padding:8px;border:1px solid #dbe6e0;border-radius:10px;background:white;font:inherit';const prompt=new Option('请选择模拟条件','');prompt.disabled=true;prompt.selected=true;select.add(prompt);options.forEach(([value,text])=>select.add(new Option(text,value)));select.onchange=()=>window.calendarPreview.fixture(select.value);field.append(select);left.querySelector('.debug-buttons').append(field);};
+ if(['ready','denied','restricted'].includes(stage)){
+  if(stage==='ready')add('restricted','模拟系统限制');
+  if(stage!=='ready'||permission!=='notDetermined')add('reset-permission','重试首次授权（模拟）');
+  if(stage==='ready'&&permission==='fullAccess'){
+   choice('下次扫描的模拟条件',[['content','恢复扫描样例'],['empty-calendar','范围内无事件'],['empty','无匹配'],['scan-failed','读取失败']]);
+  }
  }
+ if(stage==='detail')add('readonly','切换此事件可写 / 只读（模拟）');
+ if(stage==='confirm'){choice('本次删除的模拟回执',[['success','正常回执'],...(window.calendarPreview.snapshot().selected.length>1?[['partial','部分失败']]:[]),['failure','全部失败']]);}
+ const fixtureNote=document.createElement('p');fixtureNote.className='preview-fixture-note';fixtureNote.textContent=calendarState.fixtureNote||'';left.append(fixtureNote);
+ left.hidden=!left.querySelector('.debug-buttons button,.debug-buttons select');return;}
+ if(context==='clean'){
+ btn('模拟系统扩展已启用',()=>window.previewApp.web('off'));
+ btn('模拟系统扩展未启用',()=>window.previewApp.web('setup'));
+ btn('状态查询失败',()=>window.previewApp.web('unknown'));
+ if(window.previewApp?.webSnapshot().permission)btn('规则更新失败',()=>window.previewApp.web('save-failed'));
+ }
+ else if(context==='sms'){btn('首次设置（模拟）',()=>window.smsController.debug('off'));}
+ else if(context==='call'){const c=window.callController;[['off','模拟系统扩展关闭'],['on','模拟系统扩展开启'],['unknown','系统状态未知']].forEach(([s,l])=>btn(l,()=>c.debug(s)));}
+ else if(context==='sms-rules'){btn('下次保存失败',()=>window.smsController.debug('fail-next-save'));}
+ else if(context==='call-list'){[['waiting','系统扩展未启用'],['failed','同步失败']].forEach(([s,l])=>btn(l,()=>window.callController.debug(s)));}
+ else if(['web','sms-guide','call-guide','calendar-guide'].includes(context)){btn('下次打开设置失败',()=>window.cleanGuidePreview.fail());}
+ else if(context==='call-add'){btn('下次保存失败',()=>window.callController.debug('fail-next-save'));}
+ else if(['speed','cpu','display'].includes(context)){btn('进入样例演示',()=>window.testDetailController.debug('run'));btn('失败 / 重试',()=>window.testDetailController.debug('fail'));}
+ else if(context==='link'){[['clear','模拟：未发现已知风险'],['risk','模拟：发现风险'],['failure','模拟：查询不可用']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));}
+ else if(context==='qr'){[['camera-preview','模拟取景（不使用相机）'],['denied','模拟权限拒绝'],['failure','样例：无二维码'],['text','样例：非链接内容']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));}
+ else if(['wifi','device'].includes(context)){[['complete','模拟：完成'],['risk','模拟：风险']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));if(context==='wifi')btn('模拟：未连接 Wi-Fi',()=>window.safetyPreview.debug('offline'));}
+ else {left.hidden=true;}
+
+ }
+ const performancePage=document.querySelector('#test-detail');if(performancePage)new MutationObserver(()=>{if(['speed','cpu','display'].includes(context))left.hidden=!!performancePage.querySelector('.test-history-list');}).observe(performancePage,{childList:true,subtree:true});
  window.addEventListener('test-preview-mode',e=>{left.querySelector('.test-sample-label')?.remove();if(e.detail.sample){const label=document.createElement('p');label.className='preview-state test-sample-label';label.textContent='当前为样例演示';left.querySelector('h2').after(label);}});
+ window.addEventListener('load',draw);
  window.addEventListener('preview-context',e=>{context=e.detail.key;state=e.detail.state||'';if(context==='calendar')calendarState=e.detail;draw();});draw();
 })();

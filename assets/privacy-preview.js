@@ -58,13 +58,13 @@
  }
  // Buttons only vary the current level. Normal in-phone actions perform transitions.
  const stageOptions={
-  selection:[['selected','照片已选'],['read-failed','读取失败']],
-  summary:[['mixed','Found'],['none','No findings（完整检查示意）'],['incomplete','Incomplete'],['confirmed','Confirmed']],
-  group:[['mixed','可复核照片'],['read-failed','读取失败']],
+  selection:[['read-failed','读取失败']],
+  summary:[['none','No findings（完整检查示意）'],['incomplete','Incomplete']],
+  group:[['read-failed','读取失败']],
   editor:[['candidates','有候选'],['none','无候选'],['detect-failed','识别失败'],['read-failed','读取失败']],
   fields:[['fields','有可清理字段'],['none','无可清理字段'],['read-failed','读取失败']],
-  processing:[['running','进行中'],['failed','处理失败'],['cancelled','已取消']],
-  output:[['output','副本就绪'],['partial','部分失败']]
+  processing:[['failed','处理失败']],
+  output:[['partial','部分失败']]
  };
  function stopTimer(){clearTimeout(timer);sequence++;}
  function allowed(){const i=bridge()?.info();if(!i?.visible||innerWidth<=700)return false;if(!i.sample&&i.busy){notice='真实处理正在进行，未切换或修改真实选择。';mount();return false;}return true;}
@@ -111,7 +111,6 @@
   const add=(text,fn,id)=>{const b=node('button','',text);if(id){b.dataset.privacySample=id;b.setAttribute('aria-pressed',String(info.sample&&active===id));}b.onclick=fn;buttons.append(b);};
   if(info.sample)add('返回真实选择 / 本地处理',restore);
   if(info.stage==='empty'){
-   add('选择真实照片',()=>{restore();const input=document.querySelector('#privacy-detail input[type=file]');if(input){input.value='';input.click();}});
    if(!info.sample){add('载入样例照片',()=>loadCollection(),'collection');buttons.lastElementChild.disabled=loading;
     if(picker&&info.kind==='redact'){const gallery=node('div','privacy-collection');collection.forEach(([file,title],index)=>{const b=node('button');b.type='button';b.disabled=loading;b.setAttribute('aria-label',title);const img=node('img');img.src='assets/privacy/samples/'+file;img.alt='';b.append(img,node('span','',title));b.onclick=()=>loadCollection(index);gallery.append(b);});buttons.append(gallery);}
    }
@@ -123,6 +122,7 @@
    if(!options.some(([id])=>id===type))type='mixed';for(const [value,text]of options){const option=node('option','',text);option.value=value;select.append(option);}select.value=type;select.onchange=()=>{type=select.value;show(info.stage==='editor'?'candidates':'fields');};label.append(select);buttons.append(label);
   }
   const options=(stageOptions[info.stage]||[]).filter(([id])=>id!=='partial'||info.kind==='scan');for(const [id,label]of options)add('样例：'+label,()=>show(id),id);
+  left.hidden=!buttons.querySelector('button');
  }
  window.privacySamples={action:async(action,items,clean)=>{
   if(!bridge()?.info().sample)return;stopTimer();const kind=bridge().info().kind,ticket=sequence;

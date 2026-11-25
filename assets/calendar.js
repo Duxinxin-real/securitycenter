@@ -11,12 +11,13 @@
  {id:'old',title:'Old event',start:now-100*day,calendar:'Personal',category:'links',writable:true}];}
  let data=fixtures(),permission='notDetermined';try{const s=JSON.parse(localStorage.getItem(key));if(Array.isArray(s?.data))data=s.data;if(['notDetermined','fullAccess','denied','restricted'].includes(s?.permission))permission=s.permission;}catch{}
  function persist(){try{localStorage.setItem(key,JSON.stringify({data,permission}));return true;}catch{return false;}}
+ let fixtureNote='';
  let page,stage='ready',events=[],selected=new Set(),filter='all',detailId=null,timer,run=0,removed=0,error='',scenario='content',deleteMode='success',guide,settingsFail=false;
  const inertBefore=new Map(),icon=k=>`<img src="${categories[k]?.[1]||categories.links[1]}" alt="">`;
  const date=e=>new Date(e.start).toLocaleDateString('en-US',{month:'short',day:'numeric'})+' · '+(e.allDay?'All day':e.id==='b'?'9:00 AM':'10:00 AM');
  const fullDate=e=>new Date(e.start).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' · '+(e.allDay?'All day':e.id==='b'?'9:00 AM':'10:00 AM');
  const allowed=e=>e.writable!==false;
- function publish(){window.dispatchEvent(new CustomEvent('preview-context',{detail:{key:'calendar',stage,permission,state:'模拟日历 · '+stage,scenario}}));}
+ function publish(){window.dispatchEvent(new CustomEvent('preview-context',{detail:{key:'calendar',stage,permission,state:'模拟日历 · '+stage,scenario,fixtureNote}}));}
  function stop(){clearInterval(timer);run++;}
  function open(keep=false){if(!page){page=document.createElement('section');page.id='calendar-page';$('.phone').append(page);}page.hidden=false;for(const el of $('.phone').children)if(el!==page&&!el.classList.contains('statusbar')&&!inertBefore.has(el)){inertBefore.set(el,el.inert);el.inert=true;}$('.phone').classList.add('detail-open');if(!keep)stage=permission==='denied'?'denied':permission==='restricted'?'restricted':'ready';render();}
  function close(){stop();page.hidden=true;for(const [el,v] of inertBefore)el.inert=v;inertBefore.clear();$('.phone').classList.remove('detail-open');$('[data-tool="calendar"]').focus({preventScroll:true});window.dispatchEvent(new CustomEvent('preview-context',{detail:{key:'clean'}}));}
@@ -58,7 +59,19 @@
  if(a==='back')back();else if(a==='scan')scan();else if(a==='allow'){permission='fullAccess';persist();scanning();}else if(a==='deny'){permission='denied';persist();set('denied');}else if(a==='cancel')set('ready');else if(a==='all'){const list=events.filter(e=>(filter==='all'||e.category===filter)&&allowed(e)),all=list.length&&list.every(e=>selected.has(e.id));list.forEach(e=>all?selected.delete(e.id):selected.add(e.id));render();}else if(a==='confirm'&&selected.size)set('confirm');else if(a==='dismiss')set('results');else if(a==='delete')remove();else if(a==='select-detail'){selected.has(detailId)?selected.delete(detailId):selected.add(detailId);set('results');}else if(a==='review')set('results');else if(a==='done'){$('[data-tool="calendar"] .tool-copy > span').textContent=events.length?events.length+' to review':'Scanned';close();}else if(a==='settings'){if(settingsFail){settingsFail=false;error='Could not open Settings. Try again.';return render();}close();guide('calendar',()=>open());}});
  document.addEventListener('keydown',e=>{if(!page||page.hidden)return;const modal=page.querySelector('.cal-overlay');if(modal&&e.key==='Tab'){const list=[...modal.querySelectorAll('button:not(:disabled)')];if(!list.length){e.preventDefault();return;}if(e.shiftKey&&document.activeElement===list[0]){e.preventDefault();list.at(-1).focus();}else if(!e.shiftKey&&document.activeElement===list.at(-1)){e.preventDefault();list[0].focus();}}if(e.key==='Escape'){e.preventDefault();back();}});
  document.addEventListener('visibilitychange',()=>{if(document.hidden&&stage==='scanning'&&page&&!page.hidden)set('ready');});
- window.calendarPreview={init(fn){guide=fn;},open,close,snapshot:()=>({stage,permission,events:events.map(e=>({...e})),selected:[...selected],data:data.map(e=>({...e}))}),debug(s){stop();if(!page||page.hidden)open();error='';filter='all';selected.clear();deleteMode='success';scenario='content';
+ window.calendarPreview={fixture(id){
+ // Sidebar fixtures never grant access, scan, navigate into details, or delete.
+ if(!page||page.hidden)return;
+ fixtureNote='';
+ if(['ready','denied','restricted'].includes(stage)&&id==='reset-permission'){stop();permission='notDetermined';persist();return set('ready');}
+ if(stage==='ready'&&id==='restricted'){permission='restricted';persist();return set('restricted');}
+ if(stage==='ready'&&permission==='fullAccess'){
+  if(['content','empty','empty-calendar'].includes(id)){data=id==='content'?fixtures():id==='empty'?[{id:'normal',title:'Lunch',start:Date.now()-day,calendar:'Personal',writable:true}]:[];scenario='content';fixtureNote='已配置样例，请点击 App 内 Scan Calendar。';persist();publish();return;}
+  if(id==='scan-failed'){scenario=id;fixtureNote='下次读取将失败，请点击 App 内 Scan Calendar。';publish();return;}
+ }
+ if(stage==='detail'&&id==='readonly'){const event=events.find(e=>e.id===detailId);if(event){event.writable=!event.writable;selected.delete(detailId);render();}return;}
+ if(stage==='confirm'&&['success','partial','failure'].includes(id)){deleteMode=id;fixtureNote='已配置'+({success:'正常',partial:'部分失败',failure:'全部失败'}[id])+'回执，仍须在 App 内确认删除。';publish();}
+ },init(fn){guide=fn;},open,close,snapshot:()=>({stage,permission,events:events.map(e=>({...e})),selected:[...selected],data:data.map(e=>({...e}))}),debug(s){stop();if(!page||page.hidden)open();error='';filter='all';selected.clear();deleteMode='success';scenario='content';
  if(s==='reset'){data=fixtures();permission='notDetermined';persist();events=[];return set('ready');}
  if(s==='unauthorized'){permission='notDetermined';persist();return set('ready');}if(s==='permission'){permission='notDetermined';return set('permission');}if(s==='denied'||s==='restricted'){permission=s;persist();return set(s);}if(s==='settings-failed'){permission='denied';settingsFail=true;return set('denied');}
  permission='fullAccess';persist();if(s==='ready')return set('ready');if(['empty','empty-calendar'].includes(s)){data=s==='empty'?[{id:'normal',title:'Lunch',start:Date.now()-day,calendar:'Personal',writable:true}]:[];persist();events=[];return set(s);}
