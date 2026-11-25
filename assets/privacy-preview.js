@@ -4,7 +4,7 @@
  const regions={phone:{type:'phone',x:.085,y:.81,width:.58,height:.05},email:{type:'email',x:.085,y:.75,width:.58,height:.05},qr:{type:'qr',x:.75,y:.75,width:.18,height:.135},face:{type:'face',x:.40,y:.025,width:.20,height:.23}};
  const fields={gps:[['latitude','0'],['longitude','0']],camera:[['Make','Example'],['Model','Sample Camera']],time:[['DateTimeOriginal','2026-01-01T12:00:00.000Z']]};
  let context='',active='',notice='',sequence=0,timer,type='mixed',picker=false,loading=false;const files=new Map();
- const collection=[['live-flower-test.jpg','花朵 · 合成测试联系字段'],['live-lake-test-metadata.jpg','湖景 · 模拟相机和时间'],['live-fictional-id.jpg','示意身份证 · SAMPLE / TEST ONLY']];
+ const collection=[['live-flower-test.jpg','花朵 · 合成测试联系字段'],['live-lake-test-metadata.jpg','湖景 · 模拟相机和时间'],['live-citizencard-sample.png','CitizenCard 官网样卡']];
  async function loadCollection(index){
   const info=bridge()?.info();if(!info?.visible||info.stage!=='empty'||info.sample||info.busy||innerWidth<=700||loading)return;
   if(info.kind==='redact'&&index===undefined){picker=!picker;mount();return;}
@@ -107,7 +107,7 @@
   const left=document.querySelector('.preview-left'),info=bridge()?.info();if(!left)return;
   if(!['scan','redact','metadata'].includes(context)||innerWidth<=700||!info?.visible){delete left.dataset.privacyDebug;return;}
   left.dataset.privacyDebug='true';left.hidden=false;const buttons=left.querySelector('.debug-buttons');if(!buttons)return;buttons.replaceChildren();left.querySelectorAll('.privacy-sample-note').forEach(e=>e.remove());
-  const note=node('p','privacy-sample-note',notice||(info.sample?'照片为 CC0 iPhone 实拍；字段、框与状态为模拟。雕像代替真人脸，不执行识别或下载。':info.collection?'样例正在走真实本地处理：花朵含测试电话/邮箱，湖景含模拟相机/时间，证件为 示意身份证 · SAMPLE / TEST ONLY。姓名、证件号码与头像请手动核对遮盖。':'载入 3 张样例进行真实本地处理：两张 CC0 手机实拍及一张 示意身份证 · SAMPLE / TEST ONLY，仅供私有预览。花朵与湖景测试字段为合成，模拟状态另行进入。'));left.querySelector('h2').after(note);
+  const note=node('p','privacy-sample-note',notice||(info.sample?'照片为 CC0 iPhone 实拍；字段、框与状态为模拟。雕像代替真人脸，不执行识别或下载。':info.collection?'样例正在走真实本地处理：花朵含测试电话/邮箱，湖景含模拟相机/时间，证件为 CitizenCard 官网样卡。姓名、证件号码与头像请手动核对遮盖。':'载入 3 张样例进行真实本地处理：两张 CC0 手机实拍及一张 CitizenCard 官网样卡。花朵与湖景测试字段为合成，模拟状态另行进入。'));left.querySelector('h2').after(note);
   const add=(text,fn,id)=>{const b=node('button','',text);if(id){b.dataset.privacySample=id;b.setAttribute('aria-pressed',String(info.sample&&active===id));}b.onclick=fn;buttons.append(b);};
   if(info.sample)add('返回真实选择 / 本地处理',restore);
   if(info.stage==='empty'){
