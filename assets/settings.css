@@ -41,3 +41,11 @@
 @media (max-height:700px){.sc-membership-art{width:min(100%,218px)}.sc-membership-body{gap:14px}.sc-membership-copy h1{font-size:32px}}
 .sc-settings-header .detail-back svg{width:18px;height:18px;color:#475264}
 body:has(.phone.settings-open) .preview-mobile-toggle,body:has(.phone.settings-open) #vault-trial-tools{display:none!important}
+
+.sc-settings-icon.privacy{background:#eee9ff;color:#6646a2}
+.sc-settings-icon.terms{background:#e3effb;color:#22649a}
+.sc-legal{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:8px 19px 28px;overflow-wrap:anywhere}
+.sc-legal-intro{font-size:14px;color:#596971;margin:0 0 14px;padding:0 1px}
+.sc-legal section{border:1px solid #e7eeeb;border-radius:18px;background:#fff;padding:17px;margin:0 0 11px}
+.sc-legal h2{font-size:17px;line-height:1.3;margin:0 0 7px;color:#1c2633}
+.sc-legal section p{font-size:15px;line-height:1.55;color:#354451;margin:0}
