@@ -107,7 +107,7 @@
   const left=document.querySelector('.preview-left'),info=bridge()?.info();if(!left)return;
   if(!['scan','redact','metadata'].includes(context)||innerWidth<=700||!info?.visible){delete left.dataset.privacyDebug;return;}
   left.dataset.privacyDebug='true';left.hidden=false;const buttons=left.querySelector('.debug-buttons');if(!buttons)return;buttons.replaceChildren();left.querySelectorAll('.privacy-sample-note').forEach(e=>e.remove());
-  const note=node('p','privacy-sample-note',notice||(info.sample?'照片为 CC0 iPhone 实拍；字段、框与状态为模拟。雕像代替真人脸，不执行识别或下载。':info.collection?'样例正在本地处理：车牌、湖景和证件。车牌号请手动添加遮盖；证件信息与头像请逐项核对。':'载入 3 张样例：车牌、湖景和 CitizenCard 官网样卡。'));left.querySelector('h2').after(note);
+  const note=node('p','privacy-sample-note',notice||(info.sample?'照片为 CC0 iPhone 实拍；字段、框与状态为模拟。雕像代替真人脸，不执行识别或下载。':info.collection?'样例正在本地处理：车牌、湖景和证件。请检查车牌号和证件信息的遮盖范围，漏掉的内容可手动补上。':'载入 3 张样例：车牌、湖景和 CitizenCard 官网样卡。'));left.querySelector('h2').after(note);
   const add=(text,fn,id)=>{const b=node('button','',text);if(id){b.dataset.privacySample=id;b.setAttribute('aria-pressed',String(info.sample&&active===id));}b.onclick=fn;buttons.append(b);};
   if(info.sample)add('返回真实选择 / 本地处理',restore);
   if(info.stage==='empty'){

@@ -32,24 +32,45 @@ window.initPrivacy=()=>{
   });
  }
  const signal=value=>new RegExp('(?:[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}|(?:\\+?\\d[ .()-]?){7,})','i').test(value);
- async function detect(file,allText=false){
+ // Plate candidates come only from OCR text and geometry, never the image name.
+ function isPlateLine(line,w,h){
+  const b=line.bbox,text=String(line.text||'').trim();
+  if(!b||!/^[A-Z0-9]+(?:[ -][A-Z0-9]+)*$/.test(text)||!(line.confidence>=20))return false;
+  const code=text.replace(/[ -]/g,''),bw=b.x1-b.x0,bh=b.y1-b.y0;
+  if(bw<18||bh<8||bw/bh<2||bw>.97*w||bh>.68*h)return false;
+  return /^(?:[0-9]{1,2}[A-Z]{2,3}[0-9]{2,4}|[A-Z]{2,3}[0-9]{2,4}|[0-9]{2,4}[A-Z]{2,3}|[A-Z]{2}[0-9]{2}[A-Z]{3})$/.test(code);
+ }
+ async function detect(file){
   return withImage(file,async(source,ow,oh)=>{
-   const scale=Math.min(1,1800/Math.max(ow,oh)),w=Math.round(ow*scale),h=Math.round(oh*scale);
-   const canvas=Object.assign(document.createElement('canvas'),{width:w,height:h});
+   const canvas=document.createElement('canvas');
+   const raster=(scale)=>{canvas.width=Math.round(ow*scale);canvas.height=Math.round(oh*scale);canvas.getContext('2d').drawImage(source,0,0,canvas.width,canvas.height);};
+   const lines=data=>(data.blocks||[]).flatMap(b=>(b.paragraphs||[]).flatMap(p=>p.lines||[]));
+   const collect=(rows,onlyPlate)=>rows.flatMap(line=>{
+    const w=canvas.width,h=canvas.height,b=line.bbox,plate=isPlateLine(line,w,h);
+    if(!b||(!plate&&(onlyPlate||!signal(line.text))))return [];
+    const pad=plate?Math.max(3,Math.round((b.y1-b.y0)*.065)):3;
+    const x=Math.max(0,b.x0-pad),y=Math.max(0,b.y0-pad),right=Math.min(w,b.x1+pad),bottom=Math.min(h,b.y1+pad);
+    return right>x&&bottom>y?[{x:x/w,y:y/h,width:(right-x)/w,height:(bottom-y)/h,...(plate?{type:'plate'}:{})}]:[];
+   });
    try{
-    canvas.getContext('2d').drawImage(source,0,0,w,h);
-    const {data}=await deadline((async()=>{const worker=await window.privateOCR.get();return worker.recognize(canvas,{}, {blocks:true,text:false});})(),60000,'Text recognition timed out. Retry or cover manually.',()=>window.privateOCR?.stop());
-    const lines=[];
-    for(const block of data.blocks||[])for(const para of block.paragraphs||[])for(const line of para.lines||[]){
-     if(!allText&&!signal(line.text))continue;
-     // Cover the complete matching line: phone numbers can span several OCR words.
-     const words=[];
-     for(const row of words.length?words:[line]){const b=row.bbox;if(!b)continue;
-      const x=Math.max(0,b.x0-3),y=Math.max(0,b.y0-3),right=Math.min(w,b.x1+3),bottom=Math.min(h,b.y1+3);
-      lines.push({x:x/w,y:y/h,width:(right-x)/w,height:(bottom-y)/h});
-     }
-    }
-    return lines;
+    const initial=Math.min(1,1800/Math.max(ow,oh));raster(initial);
+    const first=await deadline((async()=>{const worker=await window.privateOCR.get();return {worker,pass:await worker.recognize(canvas,{}, {blocks:true,text:false})};})(),60000,'Text recognition timed out. Retry or cover manually.',()=>window.privateOCR?.stop());
+    const regular=collect(lines(first.pass.data),false);
+    if(regular.some(r=>r.type==='plate')||ow<140||oh<45)return regular;
+    raster(Math.min(2,1800/Math.max(ow,oh)));
+    // Sparse layout helps high-contrast lettering on coloured, bordered plates.
+    // Restore the standard mode before another photo uses the worker.
+    let platePass;
+    try{platePass=await deadline((async()=>{
+     await first.worker.setParameters({tessedit_pageseg_mode:'11'});
+     try{return await first.worker.recognize(canvas,{}, {blocks:true,text:false});}
+     finally{await first.worker.setParameters({tessedit_pageseg_mode:'6'});}
+    })(),15000,'Plate recognition timed out.',()=>window.privateOCR?.stop());}
+    catch(error){if(regular.length)return regular;throw error;}
+    return [...regular,...collect(lines(platePass.data),true).filter(r=>!regular.some(q=>{
+     const w=Math.max(0,Math.min(r.x+r.width,q.x+q.width)-Math.max(r.x,q.x)),h=Math.max(0,Math.min(r.y+r.height,q.y+q.height)-Math.max(r.y,q.y));
+     return w*h>.6*Math.min(r.width*r.height,q.width*q.height);
+    }))];
    }finally{canvas.width=canvas.height=1;}
   });
  }
