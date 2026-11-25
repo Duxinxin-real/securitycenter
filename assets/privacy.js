@@ -275,6 +275,6 @@ window.initPrivacy=()=>{
   restore:()=>{if(!sample)return;state=realState;realState=null;sample=false;render();},
   sampleOutput:async(items,clean)=>{const entries=[];for(const item of items){const blob=await encode(item.file,clean?[]:item.marks);entries.push({blob,name:item.file.name});}return {blob:entries[0]?.blob,entries,clean,removed:[...new Set(items.flatMap(i=>displayFields(i.fields).map(([k])=>k)))],count:entries.length,name:'sample-only.png'};}
  };
- if(!document.querySelector('script[data-privacy-samples]')){const script=document.createElement('script');script.src='assets/privacy-preview.js';script.dataset.privacySamples='true';document.head.append(script);}
+ if(!document.querySelector('script[data-privacy-samples]')){const script=document.createElement('script');script.src='assets/privacy-preview.js?v=scan-real-only-1';script.dataset.privacySamples='true';document.head.append(script);}
  return {show,cancel};
 };

@@ -109,6 +109,13 @@
   left.dataset.privacyDebug='true';left.hidden=false;const buttons=left.querySelector('.debug-buttons');if(!buttons)return;buttons.replaceChildren();left.querySelectorAll('.privacy-sample-note').forEach(e=>e.remove());
   const note=node('p','privacy-sample-note',notice||(info.sample?'照片为 CC0 iPhone 实拍；字段、框与状态为模拟。雕像代替真人脸，不执行识别或下载。':info.collection?'样例正在本地处理：车牌、湖景和证件。请复核车牌号、证件号及其他字段。浏览器不能自动识别人脸，照片上的头像请手动遮盖。':'载入 3 张样例：车牌、湖景和 CitizenCard 官网样卡。'));left.querySelector('h2').after(note);
   const add=(text,fn,id)=>{const b=node('button','',text);if(id){b.dataset.privacySample=id;b.setAttribute('aria-pressed',String(info.sample&&active===id));}b.onclick=fn;buttons.append(b);};
+  // Privacy Scan keeps only real sample loading; its simulated screens are not exposed.
+  if(info.kind==='scan'){
+   if(info.sample){restore();return;}
+   if(info.stage==='empty'){add('载入样例照片',()=>loadCollection(),'collection');buttons.lastElementChild.disabled=loading;}
+   else left.hidden=true;
+   return;
+  }
   if(info.sample)add('返回真实选择 / 本地处理',restore);
   if(info.stage==='empty'){
    if(!info.sample){add('载入样例照片',()=>loadCollection(),'collection');buttons.lastElementChild.disabled=loading;
