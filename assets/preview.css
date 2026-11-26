@@ -33,3 +33,6 @@
  .preview-left{height:243.625px}
  .preview-right{width:502.875px;height:auto}
 }
+
+/* Mobile exposes only the app, including when an old debug class remains. */
+@media(max-width:700px){body.debug-mobile .preview-panel,.preview-panel,.preview-mobile-toggle{display:none!important}}

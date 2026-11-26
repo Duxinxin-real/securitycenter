@@ -83,6 +83,13 @@
   privacy.show(mode,()=>{context('privacy');$('#privacy-page').hidden=false;history.replaceState(null,'','#privacy');$('[data-privacy="'+mode+'"]').focus({preventScroll:true});});
  }
  $$('[data-privacy]').forEach(b=>b.onclick=()=>showPrivacy(b.dataset.privacy));
+ // Existing links and browser history must update the visible Privacy tool too.
+ window.addEventListener('hashchange',()=>{
+  if(settingsController?.isOpen()||activeTab!=='privacy')return;
+  const route=location.hash,match=route.match(/^#privacy(?:\/(scan|redact|metadata))?$/);
+  if(match){privacy.hide();selectTab('privacy');$('#privacy-page').hidden=false;if(match[1])showPrivacy(match[1]);else history.replaceState(null,'','#privacy');}
+  else if(!$('#privacy-detail').hidden&&/^#(clean|test|vault)$/.test(route)){privacy.hide();selectTab(route.slice(1));}
+ });
  vaultController=window.initVault({open:html=>open(html,'vault'),close});
  settingsController=window.initSettings({vault:vaultController,context,tab:()=>activeTab,setupVault:()=>selectTab('vault')});
  $$('.settings-trigger').forEach(b=>b.onclick=()=>settingsController.open(b));

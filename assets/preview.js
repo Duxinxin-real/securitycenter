@@ -2,16 +2,16 @@
  const $=s=>document.querySelector(s);let context='clean',state='',calendarState={},calendarChoices={};
  const docs={
   "clean": [
-    "CleanTab",
+    "Security",
     "管理 Safari 的广告、弹窗、跟踪器、恶意网站和挖矿内容拦截，并进入 Calendar Clean、SafeSMS 和 SafeCall。",
     [],
     "保护范围是 Safari 内容拦截；只有系统扩展启用且所选规则成功生效，才显示保护开启。",
     [
-      "进入主界面后默认打开 Clean。点击单项开关→保存并更新对应保护；未完成系统设置时进入教程。更新失败保留旧配置，重试最近修改。",
+      "进入主界面后默认打开 Security。点击单项开关→保存并更新对应保护；未完成系统设置时进入教程。更新失败保留旧配置，重试最近修改。",
       "首页主开关在开启时进入关闭确认，全关时开启；中央盾牌在部分开启时打开管理、全开时打开关闭确认、未设置时打开教程。取消保持原配置。",
       "五项开启数为0、1–4、5时分别对应关闭、部分、全部开启；系统授权和配置更新成功后才确认保护生效，未知不能算已开启。",
       "点击 Setup Guide 查看设置教程；点击 Calendar Clean、SafeSMS、SafeCall进入对应功能，返回保留配置。",
-      "点击设置打开当前设置面板，可进入 Web Protection 管理，或关闭面板返回。"
+      "点击 Settings 打开独立设置页，提供 Membership、Change Passcode、About、Privacy Policy 和 Terms of Use；返回回来源页面。"
     ],
     [
       [
@@ -732,7 +732,7 @@
  docs['settings-passcode-new']=['输入新密码','新密码由六位数字组成。',[],'',['不能使用任何已设置的密码；输入后进入确认。'],[['返回','回到当前密码验证。']]];
  docs['settings-passcode-confirm']=['确认新密码','再次输入新密码，确认并保存后才生效。',[],'',['两次输入不一致时可重新输入。返回上一步不保存。'],[['保存成功','返回 Settings；旧密码失效，原媒体及另一套密码不变。'],['保存失败','旧密码仍可使用，不改动原有媒体。']]];
  const left=document.createElement('aside'),right=document.createElement('aside');left.className='preview-panel preview-left';right.className='preview-panel preview-right';left.setAttribute('aria-label','状态调试');right.setAttribute('aria-label','功能需求');document.body.append(left,right);
- const toggle=document.createElement('button');toggle.className='preview-mobile-toggle';toggle.textContent='调试 / 需求';toggle.onclick=()=>document.body.classList.toggle('debug-mobile');document.body.append(toggle);
+
  function click(s){const b=$(s);if(b&&!b.disabled)b.click();}
  function btn(label,action){const b=document.createElement('button');b.textContent=label;b.onclick=()=>{try{action();}catch(e){state=e.message;draw();}};left.querySelector('.debug-buttons').append(b);}
  function draw(){const d=docs[context]||docs.clean;left.hidden=false;left.innerHTML='<h2>状态切换</h2><div class="debug-buttons"></div>';right.innerHTML='<h2>'+d[0]+'</h2><p class="spec-purpose"></p><h3>页面展示</h3><table class="spec-states"><thead><tr><th scope="col">状态</th><th scope="col">展示内容</th>'+ (d[5].some(r=>r.length>2)?'<th scope="col">iOS 原生行为</th>':'') +'</tr></thead><tbody></tbody></table><h3>交互流程</h3><ol class="spec-interactions"></ol><p class="spec-boundary"></p>';right.querySelector('.spec-purpose').textContent=d[1];d[5].forEach(row=>{const tr=document.createElement('tr');row.forEach(value=>{const td=document.createElement('td');td.textContent=value;tr.append(td);});right.querySelector('.spec-states tbody').append(tr);});d[4].forEach(t=>{const li=document.createElement('li');li.textContent=t;right.querySelector('.spec-interactions').append(li);});right.querySelector('.spec-boundary').textContent=d[3];
@@ -746,31 +746,25 @@
   if(stage==='ready')add('restricted','模拟系统限制');
   if(stage!=='ready'||permission!=='notDetermined')add('reset-permission','重试首次授权（模拟）');
   if(stage==='ready'&&permission==='fullAccess'){
-   choice('下次扫描的模拟条件',[['content','恢复扫描样例'],['empty-calendar','范围内无事件'],['empty','无匹配'],['scan-failed','读取失败']]);
+   choice('下次扫描的模拟条件',[['content','恢复扫描样例'],['empty-calendar','范围内无事件'],['empty','无匹配']]);
   }
  }
  if(stage==='detail')add('readonly','切换此事件可写 / 只读（模拟）');
- if(stage==='confirm'){choice('本次删除的模拟回执',[['success','正常回执'],...(window.calendarPreview.snapshot().selected.length>1?[['partial','部分失败']]:[]),['failure','全部失败']]);}
  const fixtureNote=document.createElement('p');fixtureNote.className='preview-fixture-note';fixtureNote.textContent=calendarState.fixtureNote||'';left.append(fixtureNote);
  left.hidden=!left.querySelector('.debug-buttons button,.debug-buttons select');return;}
  if(context==='clean'){
  btn('模拟系统扩展已启用',()=>window.previewApp.web('off'));
  btn('模拟系统扩展未启用',()=>window.previewApp.web('setup'));
- btn('状态查询失败',()=>window.previewApp.web('unknown'));
- if(window.previewApp?.webSnapshot().permission)btn('规则更新失败',()=>window.previewApp.web('save-failed'));
  }
  else if(context==='sms'){btn('首次设置（模拟）',()=>window.smsController.debug('off'));}
  else if(context==='call'){const c=window.callController;[['welcome','首次设置（模拟）'],['off','模拟系统扩展关闭'],['on','模拟系统扩展开启']].forEach(([s,l])=>btn(l,()=>c.debug(s)));}
- else if(context==='sms-rules'){btn('下次保存失败',()=>window.smsController.debug('fail-next-save'));}
- else if(context==='call-list'){[['waiting','系统扩展未启用'],['failed','同步失败']].forEach(([s,l])=>btn(l,()=>window.callController.debug(s)));}
- else if(['web','sms-guide','call-guide','calendar-guide'].includes(context)){btn('下次打开设置失败',()=>window.cleanGuidePreview.fail());}
- else if(context==='call-add'){btn('下次保存失败',()=>window.callController.debug('fail-next-save'));}
- else if(['speed','cpu','display'].includes(context)){btn('进入样例演示',()=>window.testDetailController.debug('run'));btn('失败 / 重试',()=>window.testDetailController.debug('fail'));}
- else if(context==='link'){[['clear','模拟：未发现已知风险'],['risk','模拟：发现风险'],['failure','模拟：查询不可用']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));}
- else if(context==='qr'){[['camera-preview','模拟取景（不使用相机）'],['denied','模拟权限拒绝'],['failure','样例：无二维码'],['text','样例：非链接内容']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));}
+ else if(context==='call-list'){[['waiting','系统扩展未启用']].forEach(([s,l])=>btn(l,()=>window.callController.debug(s)));}
+ else if(['speed','cpu','display'].includes(context)){btn('进入样例演示',()=>window.testDetailController.debug('run'));}
+ else if(context==='link'){[['clear','模拟：未发现已知风险'],['risk','模拟：发现风险']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));}
+ else if(context==='qr'){[['camera-preview','模拟取景（不使用相机）'],['denied','模拟权限拒绝'],['text','样例：非链接内容']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));}
  else if(['wifi','device'].includes(context)){[['complete','模拟：完成'],['risk','模拟：风险']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));if(context==='wifi')btn('模拟：未连接 Wi-Fi',()=>window.safetyPreview.debug('offline'));}
  else {left.hidden=true;}
-
+ left.hidden=!left.querySelector('.debug-buttons button,.debug-buttons select');
  }
  const performancePage=document.querySelector('#test-detail');if(performancePage)new MutationObserver(()=>{if(['speed','cpu','display'].includes(context))left.hidden=!!performancePage.querySelector('.test-history-list');}).observe(performancePage,{childList:true,subtree:true});
  window.addEventListener('test-preview-mode',e=>{left.querySelector('.test-sample-label')?.remove();if(e.detail.sample){const label=document.createElement('p');label.className='preview-state test-sample-label';label.textContent='当前为样例演示';left.querySelector('h2').after(label);}});
