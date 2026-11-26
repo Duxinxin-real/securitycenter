@@ -77,18 +77,19 @@
  $('#vault-tab').onclick=()=>selectTab('vault');
  $('#privacy-tab').onclick=()=>selectTab('privacy');
  const privacy=window.initPrivacy();cancelPrivacy=privacy.cancel;
- function showPrivacy(mode){
+ function showPrivacy(mode,record=true){
   context(mode);
-  $('#privacy-page').hidden=true;history.replaceState(null,'','#privacy/'+mode);
+  $('#privacy-page').hidden=true;if(record&&location.hash!=='#privacy/'+mode)history.pushState(null,'','#privacy/'+mode);
   privacy.show(mode,()=>{context('privacy');$('#privacy-page').hidden=false;history.replaceState(null,'','#privacy');$('[data-privacy="'+mode+'"]').focus({preventScroll:true});});
  }
  $$('[data-privacy]').forEach(b=>b.onclick=()=>showPrivacy(b.dataset.privacy));
  // Existing links and browser history must update the visible Privacy tool too.
  window.addEventListener('hashchange',()=>{
-  if(settingsController?.isOpen()||activeTab!=='privacy')return;
+  if(settingsController?.isOpen())return;
   const route=location.hash,match=route.match(/^#privacy(?:\/(scan|redact|metadata))?$/);
-  if(match){privacy.hide();selectTab('privacy');$('#privacy-page').hidden=false;if(match[1])showPrivacy(match[1]);else history.replaceState(null,'','#privacy');}
-  else if(!$('#privacy-detail').hidden&&/^#(clean|test|vault)$/.test(route)){privacy.hide();selectTab(route.slice(1));}
+  if(!match&&!/^#(clean|test|vault)$/.test(route))return;
+  const apply=()=>{history.replaceState(null,'',route);if(match){selectTab('privacy');$('#privacy-page').hidden=false;history.replaceState(null,'',route);if(match[1])showPrivacy(match[1],false);}else selectTab(route.slice(1));};
+  if(!$('#privacy-detail').hidden){const current='#privacy/'+$('#privacy-detail').dataset.mode;history.replaceState(null,'',current);privacy.requestExit(apply);}else apply();
  });
  vaultController=window.initVault({open:html=>open(html,'vault'),close});
  settingsController=window.initSettings({vault:vaultController,context,tab:()=>activeTab,setupVault:()=>selectTab('vault')});

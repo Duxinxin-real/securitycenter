@@ -166,3 +166,8 @@
 #privacy-detail[data-mode="metadata"] .privacy-output .privacy-preview-grid img{width:auto;height:auto;max-width:100%;max-height:280px;border-radius:0;object-fit:contain}
 @media(max-width:370px){#privacy-page .privacy-card{height:143px}#privacy-page .privacy-copy h2{font-size:19px;letter-spacing:-.6px}#privacy-page .privacy-copy{left:13px;width:45%}#privacy-page .privacy-approved-art{right:36px;width:44%}#privacy-page .privacy-home-arrow{right:8px;width:26px;height:26px}#privacy-page .privacy-card:last-child h2{max-width:120px}}
 @media(max-width:440px){body:has(.phone[data-tab="privacy"]) .preview-mobile-toggle,body:has(.phone[data-tab="privacy"]) .preview-panel{display:none!important}}
+
+#privacy-detail .detail-header{gap:10px}#privacy-detail .detail-header h1{font-size:22px;min-width:0;white-space:normal;line-height:1.15}#privacy-detail .privacy-replace{width:auto;min-height:44px;max-width:100px;font-size:13px;font-weight:650;color:#007a60;white-space:nowrap}
+.privacy-discard{position:absolute;inset:0;z-index:10;background:#182a2566;display:grid;place-items:center;padding:28px}.privacy-discard-panel{width:100%;padding:24px;background:white;border-radius:22px;display:grid;gap:12px}.privacy-discard-panel h2{font-size:22px;margin:0 0 8px}
+
+@media(max-width:440px){body:has(.phone[data-tab="privacy"]){height:100dvh;overflow:hidden}}
