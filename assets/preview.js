@@ -760,7 +760,7 @@
  if(window.previewApp?.webSnapshot().permission)btn('规则更新失败',()=>window.previewApp.web('save-failed'));
  }
  else if(context==='sms'){btn('首次设置（模拟）',()=>window.smsController.debug('off'));}
- else if(context==='call'){const c=window.callController;[['off','模拟系统扩展关闭'],['on','模拟系统扩展开启'],['unknown','系统状态未知']].forEach(([s,l])=>btn(l,()=>c.debug(s)));}
+ else if(context==='call'){const c=window.callController;[['welcome','首次设置（模拟）'],['off','模拟系统扩展关闭'],['on','模拟系统扩展开启']].forEach(([s,l])=>btn(l,()=>c.debug(s)));}
  else if(context==='sms-rules'){btn('下次保存失败',()=>window.smsController.debug('fail-next-save'));}
  else if(context==='call-list'){[['waiting','系统扩展未启用'],['failed','同步失败']].forEach(([s,l])=>btn(l,()=>window.callController.debug(s)));}
  else if(['web','sms-guide','call-guide','calendar-guide'].includes(context)){btn('下次打开设置失败',()=>window.cleanGuidePreview.fail());}
