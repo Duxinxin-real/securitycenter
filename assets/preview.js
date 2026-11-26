@@ -759,10 +759,6 @@
  else if(context==='sms'){btn('首次设置（模拟）',()=>window.smsController.debug('off'));}
  else if(context==='call'){const c=window.callController;[['welcome','首次设置（模拟）'],['off','模拟系统扩展关闭'],['on','模拟系统扩展开启']].forEach(([s,l])=>btn(l,()=>c.debug(s)));}
  else if(context==='call-list'){[['waiting','系统扩展未启用']].forEach(([s,l])=>btn(l,()=>window.callController.debug(s)));}
- else if(['speed','cpu','display'].includes(context)){btn('进入样例演示',()=>window.testDetailController.debug('run'));}
- else if(context==='link'){[['clear','模拟：未发现已知风险'],['risk','模拟：发现风险']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));}
- else if(context==='qr'){[['camera-preview','模拟取景（不使用相机）'],['denied','模拟权限拒绝'],['text','样例：非链接内容']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));}
- else if(['wifi','device'].includes(context)){[['complete','模拟：完成'],['risk','模拟：风险']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));if(context==='wifi')btn('模拟：未连接 Wi-Fi',()=>window.safetyPreview.debug('offline'));}
  else {left.hidden=true;}
  left.hidden=!left.querySelector('.debug-buttons button,.debug-buttons select');
  }

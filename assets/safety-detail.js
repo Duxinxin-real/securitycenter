@@ -27,8 +27,6 @@
    async function linkCheck(raw,scenario){const n=++revision;clear();const parsed=inspect(raw);if(parsed.error){busy(false);show('Check the address',[parsed.error]);return;}const url=parsed.url;
     busy(true);show('',[[key==='qr'?'Link check':'Result','...']]);if(key==='qr')result.prepend(Object.assign(document.createElement('strong'),{textContent:url.href}));
     try{
-     if(scenario==='checking'){attribution('Demo state');return;}
-     if(scenario){await afterFrame();if(!valid(n))return;const title=scenario==='risk'?'Risk found':scenario==='clear'?'No known risks found':'Unable to determine';show(title,[['Domain',url.hostname],['Source','Demo'],scenario==='risk'?'Reported phishing address. Avoid opening this link.':scenario==='clear'?'Not a safety guarantee.':'Check could not finish. Try again.'],scenario==='risk'?'risk':'neutral');attribution('Demo result · Not a live website scan');return;}
      attribution('Offline domain reputation');const r=await window.checkLocalReputation(url);if(!valid(n))return;
      show(r.listed?'Risk found':r.stale?'Unable to determine':'No known risks found',[
       ['Domain',url.hostname],['Source',r.source],['Snapshot',new Date(r.snapshotAt).toISOString().slice(0,10)],
@@ -90,17 +88,7 @@
    if(key==='link'){btn.onclick=()=>linkCheck(entry.value);entry.onkeydown=e=>{if(e.key==='Enter'&&!checking)btn.click();};}
    else if(key==='qr'){const file=page.querySelector('#safety-file');btn.onclick=()=>{file.value='';file.click();};file.onchange=upload;camera();}
    else{btn.onclick=()=>check();check();}
-   activeDebug=mode=>{
-    if(key==='link'){entry.value='https://example.com';linkCheck(entry.value,mode==='live'?undefined:mode);}
-    else if(key==='qr'){
-     if(mode==='camera'||(mode==='camera-preview'&&innerWidth<=700)){camera();return;}stopCamera();revision++;clear();busy(false);page.querySelector('video').hidden=true;
-     if(mode==='camera-preview'){cameraMode='preview';page.querySelector('.qr-still').hidden=true;page.querySelector('.qr-message').hidden=true;const bg=page.querySelector('.qr-demo-background');bg.src='assets/test/qr-camera-preview.png';bg.hidden=false;page.querySelector('.qr-viewfinder').classList.add('qr-demo-active');}
-     else if(mode==='denied'){qrMessage('Allow camera access',true);action('Scan Again',camera);}
-     else if(mode==='failure'){qrMessage('No QR code found. Try another image.');action('Scan Again',camera);}
-     else if(mode==='text'){qrMessage('');decoded('Example QR content');}
-     else if(mode==='checking'){qrMessage('');linkCheck('https://example.com','checking');}
-    }else check(mode);
-   };
+   activeDebug=null;
   };
  };
 })();
