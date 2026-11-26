@@ -68,7 +68,7 @@
     [],
     "系统启用状态无法由本页直接确认；分类范围为陌生SMS/MMS，不包含iMessage。",
     [
-      "Set Up进入设置教程；Filter Rules进入规则页；Where to Find Messages进入查看指引；返回Security。进入教程、打开设置和返回均不代表过滤器已启用。",
+      "未开启时从Security进入已有设置教程；已开启时Filter Rules进入规则页，Where to Find Messages进入查看指引；返回Security。进入教程、打开设置和返回均不代表过滤器已启用。",
       "至少一类规则开启时显示Rules enabled，两类都关时显示Rules off；它表示规则配置，不表示系统扩展已经启用。",
       "适用短信到达时按已保存规则分类，结果由系统信息应用展示；关闭两类规则后放行。",
       "规则保存后保留，重新进入继续使用；设置入口用于指导用户手动选择过滤器。"
@@ -76,7 +76,7 @@
     [
       [
         "未开启",
-        "显示用途介绍与 Set Up，进入已有设置教程。"
+        "从Security直接进入已有设置教程。"
       ],
       [
         "规则已配置",
@@ -138,17 +138,17 @@
     "此功能不提供实际拦截次数或通话历史。",
     [
       "进入或从系统设置返回后重新查询；失败点击Try Again重查。",
-      "Block List进入号码名单；Open Settings进入教程；返回Clean。",
+      "权限未开启时显示Enable，进入SafeCall自己的权限设置流程；已开启时Open Settings进入同一设置流程。Block List进入号码名单；返回Security。",
       "系统启用、名单保存和名单同步分别确认；空名单不表示已经阻止任何号码。"
     ],
     [
       [
-        "状态查询",
-        "显示查询中，保留设置入口。"
+        "权限状态",
+        "读取权限结果后更新，保留Block List与设置入口。"
       ],
       [
         "已启用或未启用",
-        "根据实际状态显示；可查看Block List或打开设置教程。"
+        "首次进入与权限未开启使用同一Enable页面，保留Block List；权限开启后显示Blocking enabled。打开页面、取消或返回均不授予权限。"
       ],
       [
         "无法确认",
@@ -164,7 +164,7 @@
     [
       "Add Number进入输入页；返回SafeCall保留已保存名单。",
       "Edit→Remove→确认后保存并同步；取消保持原名单。删除最后一个号码也要同步空名单。",
-      "等待设置时先开启扩展再重试；同步失败重试最新名单，不能把本地保存当作系统已加载。",
+      "等待设置时先开启权限再重试；同步失败重试最新名单，不能把本地保存当作系统已加载。",
       "号码按规范国际格式去重，每个有效号码只保留一次；名单变化不生成拦截次数。"
     ],
     [
@@ -223,7 +223,7 @@
     [
       "进入从第1步开始；步骤号为当前序号/4，每2.2秒轮播。点击分页或左右滑动切换；后台、离开及减少动态时停止自动播放。",
       "按路径Apps→Messages→Unknown & Spam→选择过滤器手动完成设置；教程图片与分页本身不授予权限。",
-      "返回回SafeSMS；打开设置失败时留在教程，可重试。",
+      "未开启时返回Security；从已开启的SafeSMS进入时返回SafeSMS。打开设置失败时留在教程，可重试。",
       "返回后保留短信规则配置；打开设置不代表过滤器已经启用。"
     ],
     [
@@ -244,7 +244,7 @@
     "",
     [
       "进入从第1步开始；步骤号为当前序号/4，每2.2秒轮播。点击分页或左右滑动切换；后台、离开及减少动态时停止自动播放。",
-      "按路径Apps→Phone→Call Blocking & Identification→开启扩展手动完成设置；教程图片与分页本身不授予权限。",
+      "按路径Apps→Phone→Call Blocking & Identification→开启SafeCall权限手动完成设置；教程图片与分页本身不授予权限。",
       "返回回SafeCall；打开设置失败时留在教程，可重试。",
       "从系统设置返回后重新查询来电过滤状态；无法确认时显示未知，可重试。"
     ],
@@ -756,9 +756,9 @@
  btn('模拟系统扩展已启用',()=>window.previewApp.web('off'));
  btn('模拟系统扩展未启用',()=>window.previewApp.web('setup'));
  }
- else if(context==='sms'){[['off','未开启（模拟）'],['on','已开启（模拟）']].forEach(([s,l])=>btn(l,()=>window.smsController.debug(s)));}
- else if(context==='call'){const c=window.callController;[['welcome','首次设置（模拟）'],['off','模拟系统扩展关闭'],['on','模拟系统扩展开启']].forEach(([s,l])=>btn(l,()=>c.debug(s)));}
- else if(context==='call-list'){[['waiting','系统扩展未启用']].forEach(([s,l])=>btn(l,()=>window.callController.debug(s)));}
+ else if(context==='sms'||context==='sms-guide'){[['off','未开启（模拟）'],['on','已开启（模拟）']].forEach(([s,l])=>btn(l,()=>window.smsController.debug(s)));}
+ else if(context==='call'){const c=window.callController;[['off','权限未开启（模拟）'],['on','权限已开启（模拟）']].forEach(([s,l])=>btn(l,()=>c.debug(s)));}
+ else if(context==='call-list'){[['waiting','权限未开启']].forEach(([s,l])=>btn(l,()=>window.callController.debug(s)));}
  else {left.hidden=true;}
  left.hidden=!left.querySelector('.debug-buttons button,.debug-buttons select');
  }
