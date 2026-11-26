@@ -68,15 +68,15 @@
     [],
     "系统启用状态无法由本页直接确认；分类范围为陌生SMS/MMS，不包含iMessage。",
     [
-      "Get Started进入设置教程；Filter Rules进入规则页；Where to Find Messages进入查看指引；返回Clean。",
+      "Set Up进入设置教程；Filter Rules进入规则页；Where to Find Messages进入查看指引；返回Security。进入教程、打开设置和返回均不代表过滤器已启用。",
       "至少一类规则开启时显示Rules enabled，两类都关时显示Rules off；它表示规则配置，不表示系统扩展已经启用。",
       "适用短信到达时按已保存规则分类，结果由系统信息应用展示；关闭两类规则后放行。",
       "规则保存后保留，重新进入继续使用；设置入口用于指导用户手动选择过滤器。"
     ],
     [
       [
-        "首次使用",
-        "用途介绍与 Get Started。"
+        "未开启",
+        "显示用途介绍与 Set Up，进入已有设置教程。"
       ],
       [
         "规则已配置",
@@ -756,7 +756,7 @@
  btn('模拟系统扩展已启用',()=>window.previewApp.web('off'));
  btn('模拟系统扩展未启用',()=>window.previewApp.web('setup'));
  }
- else if(context==='sms'){btn('首次设置（模拟）',()=>window.smsController.debug('off'));}
+ else if(context==='sms'){[['off','未开启（模拟）'],['on','已开启（模拟）']].forEach(([s,l])=>btn(l,()=>window.smsController.debug(s)));}
  else if(context==='call'){const c=window.callController;[['welcome','首次设置（模拟）'],['off','模拟系统扩展关闭'],['on','模拟系统扩展开启']].forEach(([s,l])=>btn(l,()=>c.debug(s)));}
  else if(context==='call-list'){[['waiting','系统扩展未启用']].forEach(([s,l])=>btn(l,()=>window.callController.debug(s)));}
  else {left.hidden=true;}
