@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="assets/app.css">
 <link rel="stylesheet" href="assets/test.css">
 <link rel="stylesheet" href="assets/test-detail.css">
-<link rel="stylesheet" href="assets/vault.css?v=restore-tools-1">
+<link rel="stylesheet" href="assets/vault.css?v=photos-grid-1">
 <link rel="stylesheet" href="assets/privacy.css?v=app-copy-1-privacy-navigation-1">
 <link rel="stylesheet" href="assets/clean-guide.css?v=web-tap-1">
 <link rel="stylesheet" href="assets/safety-detail.css">
@@ -66,11 +66,11 @@
     <div class="test-scroll-end" aria-hidden="true"></div>
    </div>
   </section>
-  <section id="vault-page" hidden aria-label="Vault albums">
+  <section id="vault-page" hidden aria-label="Vault photos">
    <header class="page-header vault-header"><h1>Vault</h1><button id="vault-lock" class="vault-icon" aria-label="Lock Vault" hidden><img src="assets/vault/lock-transparent.svg" alt=""></button></header>
    <div class="vault-scroll" id="vault-scroll">
-    <section class="vault-trust" id="vault-trust" hidden><div class="vault-welcome-art" aria-hidden="true"><img src="assets/vault/onboarding-media-reference.png" alt=""></div><p>Lock your photos and videos.</p><button class="vault-primary" id="vault-intro-next">Continue</button></section>
-    <div id="vault-albums" hidden><div class="vault-section-heading"><h2>Albums</h2><button id="vault-new" aria-label="New Album"><img src="assets/vault/plus-transparent.svg" alt=""></button></div><div class="vault-grid" id="vault-grid"></div><section id="vault-empty-state" class="vault-empty-state" hidden><img src="assets/vault/empty-tray.png" width="540" height="360" alt=""><h2>No albums yet</h2></section><div class="vault-footer"><button class="vault-add" id="vault-add"><img src="assets/vault/plus-transparent.svg" alt="">Add Media</button></div></div>
+    <section class="vault-trust" id="vault-trust" hidden><div class="vault-welcome-art" aria-hidden="true"><img src="assets/vault/onboarding-media-reference.png" alt=""></div><p>Lock your photos.</p><button class="vault-primary" id="vault-intro-next">Continue</button></section>
+    <div id="vault-albums" hidden><div class="vault-grid" id="vault-grid"></div><section id="vault-empty-state" class="vault-empty-state" hidden><img src="assets/vault/empty-tray.png" width="540" height="360" alt=""><h2>No photos yet</h2></section><p id="vault-import-status" class="vault-import-status" role="status"></p><input type="file" id="vault-files" accept="image/*" multiple hidden><div class="vault-footer"><button class="vault-add" id="vault-add"><img src="assets/vault/plus-transparent.svg" alt="">Add Photos</button></div></div>
    </div>
   </section>
   <section id="privacy-page" hidden aria-label="Privacy tools">
@@ -97,7 +97,7 @@
  </main>
 </div></div>
 <script src="assets/test-detail.js?v=restore-tools-1"></script>
-<script src="assets/vault.js?v=restore-tools-1"></script>
+<script src="assets/vault.js?v=photos-grid-1"></script>
 <script src="assets/private-ocr.js"></script>
 <script src="assets/privacy.js?v=privacy-navigation-1"></script>
 <script src="assets/platform.js"></script>
@@ -106,10 +106,10 @@
 <script src="assets/reputation.js"></script>
 <script src="assets/safety-detail.js?v=restore-tools-1"></script>
 <script src="assets/calendar.js?v=delete-count-2"></script>
-<script src="assets/preview.js?v=restore-tools-1"></script>
+<script src="assets/preview.js?v=photos-grid-1"></script>
 <script src="assets/sms.js?v=direct-guides-1"></script>
 <script src="assets/settings.js?v=app-copy-1"></script>
 <script src="assets/app.js?v=privacy-navigation-1"></script>
-<script src="assets/vault-page-spec.js?v=empty-1"></script>
+<script src="assets/vault-page-spec.js?v=photos-grid-1"></script>
 </body>
 </html>
