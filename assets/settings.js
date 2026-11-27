@@ -15,13 +15,13 @@ window.initSettings=({vault,context,tab,setupVault})=>{
  const head=(title='')=>`<header class="sc-settings-header"><button class="detail-back" type="button" aria-label="Back">${icon('back')}</button>${title?`<h1>${title}</h1>`:''}</header>`;
  const documents={
   'privacy-policy':{title:'Privacy Policy',sections:[
-   ['Photos and videos','Privacy tools in the web preview process selected photos in your browser. Scanning, redaction and removal of photo details do not upload your photo to a server.'],
-   ['Vault','The public Vault keeps your imported items in the current page session. Reloading or closing the page ends that session. Keep your own copy of anything you want to retain.'],
+   ['Photos and videos','Privacy tools process selected photos on your device. Scanning, redaction and removal of photo details do not upload your photo to a server.'],
+   ['Vault','Vault keeps your imported items in the current page session. Reloading or closing the page ends that session. Keep your own copy of anything you want to retain.'],
    ['Saved copies','When you choose to save a copy, your browser downloads a new file. The original file is not changed.']
   ]},
   'terms-of-use':{title:'Terms of Use',sections:[
-   ['Scope','These notes apply to the SecurityCenter web preview. The preview does not configure your iPhone or turn on its system protection.'],
-   ['Membership','The Membership page shows plans and prices. This preview does not take payments or start a subscription.'],
+   ['Scope','Opening SecurityCenter does not configure your iPhone or turn on its system protection.'],
+   ['Membership','The Membership page shows plans and prices. This page does not take payments or start a subscription.'],
    ['Review before sharing','Automatic redaction can miss sensitive details. Review your copy and add any missing covers before sharing it. Keep your original files.']
   ]}
  };
@@ -45,7 +45,7 @@ window.initSettings=({vault,context,tab,setupVault})=>{
    page.innerHTML=head()+`<div class="sc-membership-body"><img class="sc-membership-art" src="assets/settings/membership-hero.png" alt="" decoding="async"><div class="sc-membership-copy"><h1>More privacy,<br>less worry</h1><p>Safari ad blocking · Photo redaction<br>Private vault</p></div><div class="sc-membership-plan"><p><strong>$0.99</strong> for the first week</p><p>Then <strong>$9.99</strong> per week</p><p class="sc-membership-renewal">Auto-renews weekly. Cancel anytime.</p></div></div>`;
   }else if(documents[next]){
    const doc=documents[next];
-   page.innerHTML=head(doc.title)+`<article class="sc-legal"><p class="sc-legal-intro">SecurityCenter web preview</p>${doc.sections.map(([title,body])=>`<section><h2>${title}</h2><p>${body}</p></section>`).join('')}</article>`;
+   page.innerHTML=head(doc.title)+`<article class="sc-legal"><p class="sc-legal-intro">SecurityCenter</p>${doc.sections.map(([title,body])=>`<section><h2>${title}</h2><p>${body}</p></section>`).join('')}</article>`;
   }else if(next==='about'){
    page.innerHTML=head('About')+`<div class="sc-about"><span class="sc-settings-icon premium">${icon('premium')}</span><h2>SecurityCenter</h2></div>`;
   }else if(next==='setup'||next==='unavailable'){

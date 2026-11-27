@@ -14,12 +14,8 @@
 #calendar-page .cal-reason{margin:28px 12px 0;font-size:16px}
 #calendar-page .cal-delete-dialog{padding:24px 14px 16px;background:#fff;border-radius:23px;max-height:90%;overflow:auto}
 #calendar-page .cal-delete-dialog strong{font-size:23px;line-height:30px;padding:0}
-#calendar-page .cal-confirm-events{max-height:210px;overflow:auto;margin:15px 0;text-align:left}
-#calendar-page .cal-confirm-events p{padding:10px 10px;font-size:14px;line-height:22px;margin:0;color:#7b8392}
-#calendar-page .cal-confirm-events b{font-size:17px;color:#252935}
 #calendar-page .cal-delete-dialog button{border:0;border-radius:24px;margin-top:10px;background:#f0f1f6;color:#252935}
 #calendar-page .cal-delete-dialog .danger{color:#b63a39}
-#calendar-page .cal-delete-scope{border-top:1px solid #e2e5eb;margin:10px;padding:16px 0;font-size:13px;line-height:20px}
 #calendar-page button:disabled{cursor:default;opacity:.5}
 #calendar-page .cal-categories img[src*="message"]{opacity:.64}
 @media(max-width:350px){#calendar-page .cal-recovery{padding-inline:8px}#calendar-page .cal-recovery h2{font-size:23px}#calendar-page .cal-delete-dialog strong{font-size:21px}}
@@ -29,3 +25,5 @@
 .preview-left:has(.preview-fixture-note){height:auto;overflow:auto}
 .preview-fixture-note{font-size:12px!important;line-height:18px!important;color:#858b98;margin:14px 0 0!important}
 #web-feedback{margin:12px 20px 0;padding:12px;background:#fff5f3;border-radius:12px;position:relative;z-index:1}
+
+#calendar-page .cal-delete-warning{margin:12px 0 18px;padding:0;font-size:14px;line-height:21px;color:#7b8392}

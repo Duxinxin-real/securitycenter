@@ -171,3 +171,5 @@
 .privacy-discard{position:absolute;inset:0;z-index:10;background:#182a2566;display:grid;place-items:center;padding:28px}.privacy-discard-panel{width:100%;padding:24px;background:white;border-radius:22px;display:grid;gap:12px}.privacy-discard-panel h2{font-size:22px;margin:0 0 8px}
 
 @media(max-width:440px){body:has(.phone[data-tab="privacy"]){height:100dvh;overflow:hidden}}
+/* Keep the approved illustration intact; omit its baked-in production note. */
+#privacy-detail[data-empty="true"] .privacy-empty-redact-photo::after{content:"";position:absolute;left:11.5%;top:60.5%;width:45%;height:5%;background:#fffdf8;pointer-events:none}
