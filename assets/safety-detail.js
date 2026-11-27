@@ -24,7 +24,7 @@
    function busy(value){checking=value;btn.disabled=value;if(entry)entry.disabled=value;}
    function clear(){actions.replaceChildren();attribution('');result.hidden=true;if(key==='qr'){page.querySelector('.qr-demo-background').hidden=true;page.querySelector('.qr-viewfinder').classList.remove('qr-demo-active');}}
    const afterFrame=()=>new Promise(resolve=>requestAnimationFrame(resolve));
-   async function linkCheck(raw,scenario){const n=++revision;clear();const parsed=inspect(raw);if(parsed.error){busy(false);show('Check the address',[parsed.error]);return;}const url=parsed.url;
+   async function linkCheck(raw,scenario){window.dispatchEvent(new CustomEvent('test-preview-mode',{detail:{sample:false}}));const n=++revision;clear();const parsed=inspect(raw);if(parsed.error){busy(false);show('Check the address',[parsed.error]);return;}const url=parsed.url;
     busy(true);show('',[[key==='qr'?'Link check':'Result','...']]);if(key==='qr')result.prepend(Object.assign(document.createElement('strong'),{textContent:url.href}));
     try{
      attribution('Offline domain reputation');const r=await window.checkLocalReputation(url);if(!valid(n))return;
@@ -88,7 +88,20 @@
    if(key==='link'){btn.onclick=()=>linkCheck(entry.value);entry.onkeydown=e=>{if(e.key==='Enter'&&!checking)btn.click();};}
    else if(key==='qr'){const file=page.querySelector('#safety-file');btn.onclick=()=>{file.value='';file.click();};file.onchange=upload;camera();}
    else{btn.onclick=()=>check();check();}
-   activeDebug=null;
+   activeDebug=mode=>{
+    if(innerWidth<=700||!alive())return;
+    if(key==='link'&&['clear','risk'].includes(mode)){
+     revision++;clear();busy(false);entry.value='https://example.com';
+     show(mode==='risk'?'Risk found':'No known risks found',[['Domain','example.com']],mode==='risk'?'risk':'neutral');
+     window.dispatchEvent(new CustomEvent('test-preview-mode',{detail:{sample:true}}));
+    }else if(key==='qr'&&['camera-preview','denied','text'].includes(mode)){
+     stopCamera();revision++;clear();busy(false);page.querySelector('video').hidden=true;
+     if(mode==='camera-preview'){cameraMode='preview';page.querySelector('.qr-still').hidden=true;page.querySelector('.qr-message').hidden=true;const bg=page.querySelector('.qr-demo-background');bg.src='assets/test/qr-camera-preview.png';bg.hidden=false;page.querySelector('.qr-viewfinder').classList.add('qr-demo-active');}
+     else if(mode==='denied'){cameraMode='denied';qrMessage('Allow camera access',true);action('Scan Again',camera);}
+     else {canvas.width=0;canvas.height=0;decoded('Meeting at 10:00');}
+     window.dispatchEvent(new CustomEvent('test-preview-mode',{detail:{sample:true}}));
+    }else if(['wifi','device'].includes(key)&&['complete','risk',...(key==='wifi'?['offline']:[])].includes(mode))check(mode);
+   };
   };
  };
 })();

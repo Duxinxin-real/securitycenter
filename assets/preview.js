@@ -759,10 +759,13 @@
  else if(context==='sms'||context==='sms-guide'){[['off','未开启（模拟）'],['on','已开启（模拟）']].forEach(([s,l])=>btn(l,()=>window.smsController.debug(s)));}
  else if(context==='call'||context==='call-guide'){const c=window.callController;[['off','权限未开启（模拟）'],['on','权限已开启（模拟）']].forEach(([s,l])=>btn(l,()=>c.debug(s)));}
  else if(context==='call-list'){[['waiting','权限未开启']].forEach(([s,l])=>btn(l,()=>window.callController.debug(s)));}
+ else if(['speed','cpu','display'].includes(context)){btn('查看完整结果（样例）',()=>window.testDetailController.debug('result'));}
+ else if(context==='link'){[['clear','模拟：未发现已知风险'],['risk','模拟：发现风险']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));}
+ else if(context==='qr'){[['camera-preview','模拟取景（不使用相机）'],['denied','模拟权限拒绝'],['text','样例：非链接内容']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));}
+ else if(['wifi','device'].includes(context)){[['complete','模拟：完成'],['risk','模拟：风险']].forEach(([s,l])=>btn(l,()=>window.safetyPreview.debug(s)));if(context==='wifi')btn('模拟：未连接 Wi-Fi',()=>window.safetyPreview.debug('offline'));}
  else {left.hidden=true;}
  left.hidden=!left.querySelector('.debug-buttons button,.debug-buttons select');
  }
- const performancePage=document.querySelector('#test-detail');if(performancePage)new MutationObserver(()=>{if(['speed','cpu','display'].includes(context))left.hidden=!!performancePage.querySelector('.test-history-list');}).observe(performancePage,{childList:true,subtree:true});
  window.addEventListener('test-preview-mode',e=>{left.querySelector('.test-sample-label')?.remove();if(e.detail.sample){const label=document.createElement('p');label.className='preview-state test-sample-label';label.textContent='当前为样例演示';left.querySelector('h2').after(label);}});
  window.addEventListener('load',()=>{if(context==='clean')draw();});
  window.addEventListener('preview-context',e=>{context=e.detail.key;state=e.detail.state||'';if(context==='calendar'){if(calendarState.stage!==e.detail.stage)calendarChoices={};calendarState=e.detail;}draw();});draw();

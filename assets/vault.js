@@ -3,8 +3,9 @@ window.initVault=({open,close})=>{
  const modes=['private','decoy'],store='clean-vault-v1',encoder=new TextEncoder();
  // Explicit opt-in, fixed for this document. Never open persistent Vault storage in this mode.
  const previewValues=new URLSearchParams(location.search).getAll('vault-preview');
+ const sampleAlbums=previewValues.length===1&&previewValues[0]==='albums';
  const publicPreview=location.host.toLowerCase()==='duxinxin-real.github.io';
- const onboardingPreview=publicPreview||(previewValues.length===1&&previewValues[0]==='onboarding');
+ const onboardingPreview=sampleAlbums||publicPreview||(previewValues.length===1&&previewValues[0]==='onboarding');
  const transient={profiles:{},catalogs:new Map(),media:new Map()};
  const readProfiles=()=>onboardingPreview?structuredClone(transient.profiles):JSON.parse(localStorage.getItem(store)||'{}');
  const saveProfiles=profiles=>{if(onboardingPreview)transient.profiles=structuredClone(profiles);else localStorage.setItem(store,JSON.stringify(profiles));};
@@ -12,7 +13,7 @@ window.initVault=({open,close})=>{
  const state={profile:{},key:null,active:null,album:null,version:0,revision:null,transactions:new Set(),urls:[],data:{private:[],decoy:[]}};
  let profileError=false;
  try{const p=readProfiles();if(!p||Array.isArray(p)||typeof p!=='object')throw Error('Invalid profile');for(const m of modes)if(p[m]){if(!p[m].salt||!p[m].iv||!p[m].proof)throw Error('Invalid profile');state.profile[m]=p[m];}}catch{profileError=true;}
- const emptyAlbums=m=>(publicPreview?[]:onboardingPreview?samples[m].slice(0,m==='private'?2:1):samples[m]).map(([cover,name])=>({id:crypto.randomUUID(),cover,name,items:[]}));
+ const emptyAlbums=m=>(sampleAlbums?samples[m].slice(0,m==='private'?2:1):[]).map(([cover,name])=>({id:crypto.randomUUID(),cover,name,items:[]}));
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const ready=()=>Boolean(crypto.subtle),bytes=x=>new Uint8Array(x),vector=()=>crypto.getRandomValues(new Uint8Array(12));
  const back='<button class="detail-back" aria-label="Back"><img src="assets/test/detail-back.svg" alt=""></button>';
@@ -195,6 +196,8 @@ window.initVault=({open,close})=>{
   const ordinary=new URL(location.href);ordinary.searchParams.delete('vault-preview');ordinary.hash='vault';
   const trial=new URL(ordinary.href);trial.searchParams.set('vault-preview','onboarding');
   restore.onclick=()=>{if(location.href===trial.href)location.reload();else location.assign(trial.href);};tools.append(restore);
+  const albumsURL=new URL(ordinary.href);albumsURL.searchParams.set('vault-preview','albums');const albums=document.createElement('a');albums.id='vault-sample-albums';albums.textContent='查看样例相册';albums.href=albumsURL.href;albums.target='_blank';albums.rel='noopener';tools.append(albums);
+  const note=document.createElement('p');note.textContent='样例相册在独立临时页面打开；恢复新人返回正常空态流程。';tools.append(note);
   if(onboardingPreview&&!publicPreview){const original=document.createElement('button');original.id='vault-return-original';original.textContent='返回原 Vault';original.onclick=()=>location.assign(ordinary.href);tools.append(original);}
   document.body.append(tools);let externalContext=phone.dataset.tab||'clean';
   const position=()=>{
